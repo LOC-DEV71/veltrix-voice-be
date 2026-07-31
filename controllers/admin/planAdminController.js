@@ -1,4 +1,5 @@
 const Plan = require('../../models/planModel');
+const { clearPlanCache } = require('../../validators/voiceValidator');
 
 class PlanAdminController {
     // 1. Get all plans
@@ -17,6 +18,7 @@ class PlanAdminController {
         try {
             const newPlan = new Plan(req.body);
             await newPlan.save();
+            clearPlanCache();
             return res.json({ success: true, plan: newPlan, message: 'Thêm gói thành công' });
         } catch (error) {
             console.error('Lỗi thêm gói:', error);
@@ -32,6 +34,7 @@ class PlanAdminController {
             if (!updatedPlan) {
                 return res.status(404).json({ error: 'Không tìm thấy gói' });
             }
+            clearPlanCache();
             return res.json({ success: true, plan: updatedPlan, message: 'Cập nhật gói thành công' });
         } catch (error) {
             console.error('Lỗi cập nhật gói:', error);
@@ -47,6 +50,7 @@ class PlanAdminController {
             if (!deletedPlan) {
                 return res.status(404).json({ error: 'Không tìm thấy gói' });
             }
+            clearPlanCache();
             return res.json({ success: true, message: 'Xóa gói thành công' });
         } catch (error) {
             console.error('Lỗi xóa gói:', error);

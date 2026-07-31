@@ -62,6 +62,10 @@ const planSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    priority: {
+        type: Number,
+        default: 0 // Thứ tự cấp bậc gói: FREE=0, BASIC=1, CREATOR=2, PRO=3, CUSTOM=99
+    },
     status: {
         type: String,
         enum: ['ACTIVE', 'INACTIVE'],

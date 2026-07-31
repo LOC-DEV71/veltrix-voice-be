@@ -2,6 +2,8 @@ const jwt = require('jsonwebtoken');
 const Account = require('../../models/accountModel');
 const Role = require('../../models/roleModel');
 const { JWT_SECRET, JWT_EXPIRES_IN, COOKIE_OPTIONS } = require('../../config/jwt');
+const { validatePassword } = require('../../utils/passwordValidator');
+const { validateEmail } = require('../../utils/emailValidator');
 
 class AccountAdminController {
     // 1. Đăng nhập Admin
@@ -12,6 +14,11 @@ class AccountAdminController {
                 return res.status(400).json({ error: 'Vui lòng nhập Email và Mật khẩu Admin!' });
             }
 
+            const emailCheck = validateEmail(email);
+            if (!emailCheck.isValid) {
+                return res.status(400).json({ error: emailCheck.message });
+            }
+
             const account = await Account.findOne({ email }).populate('role');
             if (!account) {
                 return res.status(401).json({ error: 'Tài khoản Admin không tồn tại!' });
@@ -20,6 +27,10 @@ class AccountAdminController {
             const isMatch = await account.comparePassword(password);
             if (!isMatch) {
                 return res.status(401).json({ error: 'Mật khẩu Admin không chính xác!' });
+            }
+
+            if (account.status === 'INACTIVE') {
+                return res.status(403).json({ error: 'Tài khoản Quản trị viên của bạn đã bị vô hiệu hóa hoặc khóa!' });
             }
 
             const token = jwt.sign({ id: account._id }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
@@ -67,11 +78,24 @@ class AccountAdminController {
     static async createAccount(req, res) {
         try {
             const { name, email, password, role, status } = req.body;
+
+            const emailCheck = validateEmail(email);
+            if (!emailCheck.isValid) {
+                return res.status(400).json({ error: emailCheck.message });
+            }
+
             // Check email exist
             const existing = await Account.findOne({ email });
             if (existing) {
                 return res.status(400).json({ error: 'Email đã tồn tại' });
             }
+
+            // Bắt buộc kiểm tra độ mạnh của Mật khẩu
+            const passwordCheck = validatePassword(password);
+            if (!passwordCheck.isValid) {
+                return res.status(400).json({ error: passwordCheck.message });
+            }
+
             const newAccount = await Account.create({ name, email, password, role, status });
             return res.status(201).json({ success: true, message: 'Tạo tài khoản thành công!', account: newAccount });
         } catch (err) {
@@ -88,6 +112,22 @@ class AccountAdminController {
             const account = await Account.findById(accountId);
             if (!account) {
                 return res.status(404).json({ error: 'Không tìm thấy tài khoản' });
+            }
+
+            if (email) {
+                const emailCheck = validateEmail(email);
+                if (!emailCheck.isValid) {
+                    return res.status(400).json({ error: emailCheck.message });
+                }
+                account.email = email;
+            }
+
+            if (password) {
+                const passwordCheck = validatePassword(password);
+                if (!passwordCheck.isValid) {
+                    return res.status(400).json({ error: passwordCheck.message });
+                }
+                account.password = password;
             }
 
             if (name) account.name = name;

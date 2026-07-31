@@ -20,8 +20,8 @@ async function authenticateToken(req, res, next) {
         const decoded = jwt.verify(token, JWT_SECRET);
         const user = await User.findById(decoded.id).select('-password');
 
-        if (!user) {
-            return res.status(401).json({ error: 'Tài khoản không tồn tại hoặc đã bị xóa.' });
+        if (!user || user.status !== 'ACTIVE') {
+            return res.status(401).json({ error: 'Tài khoản không tồn tại hoặc đã bị khóa/vô hiệu hóa.' });
         }
 
         req.user = user;

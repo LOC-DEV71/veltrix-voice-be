@@ -207,26 +207,33 @@ function renderHtmlTemplate({ title, category, greeting, messageHtml, codeValue,
  */
 async function createTransporter() {
     const setting = await Setting.findOne();
-    if (!setting || !setting.smtpUser || !setting.smtpPass) {
-        throw new Error("Hệ thống chưa cài đặt Email Gửi Đi và Mật Khẩu Ứng Dụng SMTP trong Admin Settings!");
+    const smtpUser = setting?.smtpUser || process.env.SMTP_USER || process.env.EMAIL_USER;
+    const smtpPass = setting?.smtpPass || process.env.SMTP_PASS || process.env.EMAIL_PASS;
+    const smtpHost = setting?.smtpHost || process.env.SMTP_HOST || 'smtp.gmail.com';
+    const smtpPort = setting?.smtpPort || process.env.SMTP_PORT || 587;
+    const smtpSecure = setting?.smtpSecure ?? false;
+    const senderName = setting?.smtpFromName || setting?.siteName || 'Veltrix Voice';
+
+    if (!smtpUser || !smtpPass) {
+        throw new Error("Hệ thống chưa cài đặt Email Gửi Đi (SMTP_USER/SMTP_PASS) trong Admin Settings hoặc file .env!");
     }
 
     return {
         transporter: nodemailer.createTransport({
-            host: setting.smtpHost || 'smtp.gmail.com',
-            port: setting.smtpPort || 587,
-            secure: setting.smtpSecure || false,
+            host: smtpHost,
+            port: Number(smtpPort),
+            secure: Boolean(smtpSecure),
             pool: true,
             connectionTimeout: 10000,
             greetingTimeout: 5000,
             socketTimeout: 10000,
             auth: {
-                user: setting.smtpUser,
-                pass: setting.smtpPass
+                user: smtpUser,
+                pass: smtpPass
             }
         }),
-        senderName: setting.smtpFromName || setting.siteName || 'Veltrix Voice',
-        senderEmail: setting.smtpUser
+        senderName: senderName,
+        senderEmail: smtpUser
     };
 }
 
@@ -249,11 +256,20 @@ async function sendEmail({ to, subject, title, category, greeting, messageHtml, 
         footerNote
     });
 
+    const textFallback = `${greeting || 'Xin chào'},\n\n${messageHtml ? messageHtml.replace(/<[^>]*>?/gm, '') : ''}\n\n${codeValue ? `MÃ SỐ BẢO MẬT: ${codeValue}\n` : ''}${actionUrl ? `${actionText || 'Xác nhận'}: ${actionUrl}\n\n` : ''}${footerNote || ''}`;
+
     const info = await transporter.sendMail({
         from: `"${senderName}" <${senderEmail}>`,
+        replyTo: `"${senderName}" <${senderEmail}>`,
         to,
         subject,
-        html: htmlContent
+        text: textFallback,
+        html: htmlContent,
+        headers: {
+            'X-Priority': '1 (Highest)',
+            'X-MSMail-Priority': 'High',
+            'Importance': 'High'
+        }
     });
 
     return info;

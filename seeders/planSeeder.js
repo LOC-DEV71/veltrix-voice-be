@@ -31,6 +31,7 @@ const PLANS = [
         ],
         isFeatured: true,
         isPopular: false,
+        priority: 0,
         status: 'ACTIVE'
     },
     {
@@ -61,6 +62,7 @@ const PLANS = [
         ],
         isFeatured: false,
         isPopular: false,
+        priority: 10,
         status: 'ACTIVE'
     },
     {
@@ -93,6 +95,7 @@ const PLANS = [
         ],
         isFeatured: true,
         isPopular: true,
+        priority: 20,
         status: 'ACTIVE'
     },
     {
@@ -127,6 +130,7 @@ const PLANS = [
         ],
         isFeatured: false,
         isPopular: false,
+        priority: 30,
         status: 'ACTIVE'
     },
     {
@@ -155,6 +159,7 @@ const PLANS = [
         ],
         isFeatured: true,
         isPopular: false,
+        priority: 99,
         status: 'ACTIVE'
     }
 ];

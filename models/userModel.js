@@ -29,6 +29,18 @@ const userSchema = new mongoose.Schema({
         enum: ['ACTIVE', 'INACTIVE'],
         default: 'ACTIVE'
     },
+    isVerified: {
+        type: Boolean,
+        default: false
+    },
+    verificationToken: {
+        type: String,
+        default: null
+    },
+    verificationTokenExpires: {
+        type: Date,
+        default: null
+    },
     tokens: {
         type: Number,
         default: 2000
@@ -57,6 +69,9 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
+    trustedIps: [{
+        type: String
+    }],
     subscriptionHistory: [{
         planName: { type: String, required: true },
         tier: { type: String, required: true },

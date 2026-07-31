@@ -30,6 +30,14 @@ const audioLogSchema = new mongoose.Schema({
     ipAddress: {
         type: String,
         default: ''
+    },
+    title: {
+        type: String,
+        default: ''
+    },
+    folder: {
+        type: String,
+        default: 'Mặc định'
     }
 }, {
     timestamps: true

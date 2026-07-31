@@ -1,4 +1,5 @@
 const Voice = require('../../models/voiceModel');
+const { isVoiceLocked } = require('../../validators/voiceValidator');
 
 class ClientVoiceController {
     static async getVoices(req, res) {
@@ -8,35 +9,30 @@ class ClientVoiceController {
             // Lấy giọng đọc ACTIVE từ MongoDB Atlas (dynamic, không hardcode)
             const voices = await Voice.find({ status: 'ACTIVE' }).sort({ createdAt: 1 });
 
-            const availableVoices = voices.map(voice => {
-                const reqRole = voice.requiredRole || 'FREE';
-                const isFreeVoice = reqRole === 'FREE' || reqRole === 'ROLE_USER';
+            // Dùng Promise.all vì isVoiceLocked là async (query Plan hierarchy từ DB)
+            const availableVoices = await Promise.all(
+                voices.map(async (voice) => {
+                    const reqRole = voice.requiredRole || 'FREE';
 
-                // Trạng thái khóa/mở giọng đọc dựa theo Hạng tài khoản của User
-                let isLocked = false;
-                if (!isFreeVoice) {
-                    if (userTier === 'FREE') {
-                        isLocked = true;
-                    } else if (reqRole !== 'FREE' && userTier !== reqRole && userTier !== 'PRO' && userTier !== 'VIP') {
-                        isLocked = true;
-                    }
-                }
+                    // Check quyền ĐỘNG dựa trên Plan.priority trong MongoDB
+                    const locked = await isVoiceLocked(userTier, reqRole);
 
-                return {
-                    id: voice.voiceId,
-                    name: voice.name,
-                    gender: voice.gender,
-                    region: voice.region,
-                    language: voice.language,
-                    provider: voice.provider,
-                    badge: voice.badge,
-                    desc: voice.desc,
-                    sampleText: voice.sampleText || 'Xin chào, đây là giọng đọc thử nghiệm của tôi trên Veltrix Voice.',
-                    sampleAudioUrl: voice.sampleAudioUrl || '',
-                    requiredRole: reqRole,
-                    isLocked
-                };
-            });
+                    return {
+                        id: voice.voiceId,
+                        name: voice.name,
+                        gender: voice.gender,
+                        region: voice.region,
+                        language: voice.language,
+                        provider: voice.provider,
+                        badge: voice.badge,
+                        desc: voice.desc,
+                        sampleText: voice.sampleText || 'Xin chào, đây là giọng đọc thử nghiệm của tôi trên Veltrix Voice.',
+                        sampleAudioUrl: voice.sampleAudioUrl || '',
+                        requiredRole: reqRole,
+                        isLocked: locked
+                    };
+                })
+            );
 
             return res.json({ voices: availableVoices });
         } catch (err) {

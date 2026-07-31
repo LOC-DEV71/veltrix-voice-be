@@ -1,6 +1,9 @@
-const { generateSpeechStream } = require('../../utils/ttsEngine');
+const { generateSpeechBuffer, generateSpeechStream } = require('../../utils/ttsEngine');
 const { uploadAudioBufferToCloudinary } = require('../../utils/cloudinary');
 const AudioLog = require('../../models/audioLogModel');
+const Folder = require('../../models/folderModel');
+
+const mongoose = require('mongoose');
 
 class ClientTtsController {
     // Nghe thử giọng đọc — CHỈ phát audio mẫu, KHÔNG trừ token, KHÔNG lưu lịch sử
@@ -28,7 +31,7 @@ class ClientTtsController {
 
     static async generate(req, res) {
         try {
-            const { text, voice, rate, pitch } = req.body;
+            const { text, voice, rate, pitch, title, folder } = req.body;
             const user = req.user;
 
             if (!text || typeof text !== 'string' || text.trim().length === 0) {
@@ -74,50 +77,43 @@ class ClientTtsController {
             user.tokens = Math.max(0, user.tokens - charCount);
             await user.save();
 
-            // 1. Sinh Stream âm thanh từ TTS Engine
-            const audioStream = await generateSpeechStream(text, voice, { rate, pitch });
+            // 1. Sinh âm thanh siêu tốc từ Smart Hybrid TTS Engine (0.7s - 1.2s)
+            const audioBuffer = await generateSpeechBuffer(text, voice, { rate, pitch });
 
-            // 2. Gom Stream thành Buffer để upload Cloudinary
-            const chunks = [];
-            audioStream.on('data', (chunk) => chunks.push(chunk));
-            
-            audioStream.on('end', async () => {
-                try {
-                    const audioBuffer = Buffer.concat(chunks);
-                    let cloudAudioUrl = '';
+            // 2. Upload Cloudinary kèm Timeout 3.5s chống nghẽn đường truyền
+            let cloudAudioUrl = '';
+            try {
+                const cloudPromise = uploadAudioBufferToCloudinary(audioBuffer);
+                const timeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('Cloudinary Timeout (3.5s)')), 3500)
+                );
+                cloudAudioUrl = await Promise.race([cloudPromise, timeoutPromise]);
+            } catch (cloudErr) {
+                console.error("Lỗi Upload Cloudinary:", cloudErr.message);
+            }
 
-                    // Upload lên Cloudinary Cloud Storage
-                    try {
-                        cloudAudioUrl = await uploadAudioBufferToCloudinary(audioBuffer);
-                    } catch (cloudErr) {
-                        console.error("Lỗi Upload Cloudinary:", cloudErr.message);
-                    }
-
-                    // 3. Lưu lịch sử tạo Audio thực vào Bảng AudioLog MongoDB Atlas
-                    const newAudioLog = await AudioLog.create({
-                        user: user._id,
-                        text,
-                        voiceId: voice,
-                        audioUrl: cloudAudioUrl,
-                        charactersCount: charCount,
-                        tokensDeducted: charCount,
-                        ipAddress: user.lastLoginIp || ''
-                    });
-
-                    // 4. Trả về stream âm thanh MP3 kèm Header thông tin
-                    res.set({
-                        'Content-Type': 'audio/mpeg',
-                        'X-Remaining-Tokens': user.tokens,
-                        'X-Audio-Url': cloudAudioUrl,
-                        'X-Audio-Id': newAudioLog._id
-                    });
-
-                    return res.send(audioBuffer);
-                } catch (saveErr) {
-                    console.error("Lỗi lưu AudioLog DB:", saveErr);
-                }
+            // 3. Lưu lịch sử tạo Audio thực vào Bảng AudioLog MongoDB Atlas
+            const newAudioLog = await AudioLog.create({
+                user: user._id,
+                text,
+                voiceId: voice,
+                audioUrl: cloudAudioUrl,
+                charactersCount: charCount,
+                tokensDeducted: charCount,
+                ipAddress: user.lastLoginIp || '',
+                title: title && title.trim() ? title.trim() : '',
+                folder: folder && folder.trim() ? folder.trim() : 'Mặc định'
             });
 
+            // 4. Trả về MP3 Buffer ngay lập tức cho client
+            res.set({
+                'Content-Type': 'audio/mpeg',
+                'X-Remaining-Tokens': user.tokens,
+                'X-Audio-Url': cloudAudioUrl,
+                'X-Audio-Id': newAudioLog._id
+            });
+
+            return res.send(audioBuffer);
         } catch (err) {
             console.error("Client TTS Generation Error:", err);
             if (!res.headersSent) {
@@ -147,6 +143,53 @@ class ClientTtsController {
             return res.json({ success: true, message: "Đã xóa bài đọc thành công" });
         } catch (err) {
             return res.status(500).json({ error: "Lỗi xóa bài đọc: " + err.message });
+        }
+    }
+
+    // Lấy danh sách Thư mục dự án của người dùng
+    static async getFolders(req, res) {
+        try {
+            const folders = await Folder.find({ user: req.user._id }).sort({ name: 1 });
+            return res.json({ folders });
+        } catch (err) {
+            return res.status(500).json({ error: "Lỗi lấy danh sách thư mục: " + err.message });
+        }
+    }
+
+    // Tạo thư mục dự án mới
+    static async createFolder(req, res) {
+        try {
+            const { name, color } = req.body;
+            if (!name || !name.trim()) {
+                return res.status(400).json({ error: "Vui lòng nhập tên thư mục!" });
+            }
+            const existing = await Folder.findOne({ user: req.user._id, name: name.trim() });
+            if (existing) {
+                return res.status(400).json({ error: "Thư mục này đã tồn tại!" });
+            }
+            const newFolder = await Folder.create({
+                user: req.user._id,
+                name: name.trim(),
+                color: color || '#8b5cf6'
+            });
+            return res.status(201).json({ folder: newFolder, message: "Tạo thư mục thành công!" });
+        } catch (err) {
+            return res.status(500).json({ error: "Lỗi tạo thư mục: " + err.message });
+        }
+    }
+
+    // Xóa thư mục dự án
+    static async deleteFolder(req, res) {
+        try {
+            const { id } = req.params;
+            if (mongoose.Types.ObjectId.isValid(id)) {
+                await Folder.findOneAndDelete({ _id: id, user: req.user._id });
+            } else {
+                await Folder.findOneAndDelete({ name: decodeURIComponent(id), user: req.user._id });
+            }
+            return res.json({ success: true, message: "Đã xóa thư mục thành công!" });
+        } catch (err) {
+            return res.status(500).json({ error: "Lỗi xóa thư mục: " + err.message });
         }
     }
 }
