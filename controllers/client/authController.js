@@ -20,25 +20,40 @@ function getClientIp(req) {
     return ip;
 }
 
-// Helper tự động kiểm tra & cập nhật dữ liệu cũ trong MongoDB Atlas về chuẩn 2,000 ký tự / ngày
+// Helper tự động kiểm tra & làm mới token hàng ngày (00:00) cho người dùng
 async function checkAndResetDailyTokens(user) {
     const todayStr = new Date().toISOString().split('T')[0];
     let isModified = false;
 
-    // Cập nhật lại các tài khoản cũ từng lưu 5,000 token trong DB về chuẩn 2,000 ký tự
-    if (user.dailyTokenLimit !== 2000) {
+    // 1. Kiểm tra nếu gói cước nâng cấp đã hết hạn (quá ngày planExpiresAt)
+    if (user.tier !== 'FREE' && user.planExpiresAt && new Date() > new Date(user.planExpiresAt)) {
+        user.tier = 'FREE';
+        user.dailyTokenLimit = 2000;
+        user.maxCharsPerRequest = 1000;
+        if (user.tokens > 2000) {
+            user.tokens = 2000;
+        }
+        user.planExpiresAt = null;
+        user.subscriptionHistory.unshift({
+            planName: 'Gói cước đã hết hạn (Tự động về Miễn Phí)',
+            tier: 'FREE',
+            tokensGranted: 2000,
+            price: '0 VNĐ',
+            createdAt: new Date()
+        });
+        isModified = true;
+    }
+
+    // 2. Đảm bảo dailyTokenLimit không bị rỗng hoặc <= 0
+    if (!user.dailyTokenLimit || user.dailyTokenLimit <= 0) {
         user.dailyTokenLimit = 2000;
         isModified = true;
     }
 
-    if (user.tokens > 2000) {
-        user.tokens = 2000;
-        isModified = true;
-    }
-
+    // 3. Reset daily tokens khi sang ngày mới (00:00) dựa theo dailyTokenLimit thực tế của user
     if (user.lastDailyResetDate !== todayStr) {
         user.dailyTokensUsed = 0;
-        user.tokens = 2000;
+        user.tokens = user.dailyTokenLimit;
         user.lastDailyResetDate = todayStr;
         isModified = true;
     }
@@ -126,9 +141,9 @@ class ClientAuthController {
 
             if (!user.subscriptionHistory || user.subscriptionHistory.length === 0) {
                 user.subscriptionHistory = [{
-                    planName: `Gói ${user.tier || 'FREE'} (2,000 Ký Tự/Ngày)`,
+                    planName: `Gói ${user.tier || 'FREE'} (${(user.dailyTokenLimit || 2000).toLocaleString()} Ký Tự/Ngày)`,
                     tier: user.tier || 'FREE',
-                    tokensGranted: 2000,
+                    tokensGranted: user.dailyTokenLimit || 2000,
                     price: '0 VNĐ'
                 }];
             }
@@ -197,9 +212,9 @@ class ClientAuthController {
 
                 if (!user.subscriptionHistory || user.subscriptionHistory.length === 0) {
                     user.subscriptionHistory = [{
-                        planName: `Gói ${user.tier || 'FREE'} (2,000 Ký Tự/Ngày)`,
+                        planName: `Gói ${user.tier || 'FREE'} (${(user.dailyTokenLimit || 2000).toLocaleString()} Ký Tự/Ngày)`,
                         tier: user.tier || 'FREE',
-                        tokensGranted: 2000,
+                        tokensGranted: user.dailyTokenLimit || 2000,
                         price: '0 VNĐ'
                     }];
                 }
@@ -234,9 +249,9 @@ class ClientAuthController {
 
         if (!req.user.subscriptionHistory || req.user.subscriptionHistory.length === 0) {
             req.user.subscriptionHistory = [{
-                planName: `Gói ${req.user.tier || 'FREE'} (2,000 Ký Tự/Ngày)`,
+                planName: `Gói ${req.user.tier || 'FREE'} (${(req.user.dailyTokenLimit || 2000).toLocaleString()} Ký Tự/Ngày)`,
                 tier: req.user.tier || 'FREE',
-                tokensGranted: 2000,
+                tokensGranted: req.user.dailyTokenLimit || 2000,
                 price: '0 VNĐ'
             }];
             await req.user.save();

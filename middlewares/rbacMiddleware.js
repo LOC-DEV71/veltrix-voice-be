@@ -28,7 +28,7 @@ function checkTtsAttributes(req, res, next) {
         return res.status(400).json({ error: 'Văn bản không được để trống.' });
     }
 
-    const charLength = text.length;
+    const charLength = text?.length;
 
     // Kiểm tra thuộc tính 1: Giới hạn độ dài ký tự tối đa cho phép của gói
     if (charLength > user.maxCharsPerRequest) {

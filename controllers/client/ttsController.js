@@ -30,30 +30,48 @@ class ClientTtsController {
         try {
             const { text, voice, rate, pitch } = req.body;
             const user = req.user;
+
+            if (!text || typeof text !== 'string' || text.trim().length === 0) {
+                return res.status(400).json({ error: 'Vui lòng nhập văn bản cần tạo giọng đọc!' });
+            }
+
             const charCount = text.length;
+            const maxChars = user.maxCharsPerRequest || 1000;
+
+            if (charCount > maxChars) {
+                return res.status(400).json({ 
+                    error: `⚠️ Đoạn văn của bạn có ${charCount.toLocaleString()} ký tự, vượt quá giới hạn tối đa ${maxChars.toLocaleString()} ký tự/lượt cho gói hiện tại!` 
+                });
+            }
 
             const todayStr = new Date().toISOString().split('T')[0];
+            const maxDaily = user.dailyTokenLimit || 2000;
 
-            // Tự động Reset Hạn Mức 2,000 ký tự vào lúc 00:00 hàng ngày
+            // Tự động Reset Hạn Mức khi sang ngày mới (00:00)
             if (user.lastDailyResetDate !== todayStr) {
                 user.dailyTokensUsed = 0;
-                user.tokens = user.dailyTokenLimit || 2000;
+                user.tokens = maxDaily;
                 user.lastDailyResetDate = todayStr;
             }
 
-            const maxDaily = user.dailyTokenLimit || 2000;
+            // 1. Kiểm tra số dư token còn lại
+            if (user.tokens < charCount) {
+                return res.status(400).json({
+                    error: `⚠️ Số dư Token không đủ! Bạn cần ${charCount.toLocaleString()} token nhưng chỉ còn ${(user.tokens || 0).toLocaleString()} token. Vui lòng nạp thêm.`
+                });
+            }
 
-            // Kiểm tra nếu vượt quá hạn mức 2,000 ký tự trong ngày
+            // 2. Kiểm tra giới hạn dùng trong ngày
             if (user.dailyTokensUsed + charCount > maxDaily) {
                 const remainingToday = Math.max(0, maxDaily - user.dailyTokensUsed);
                 return res.status(400).json({ 
-                    error: `⚠️ Bạn đã dùng vượt hạn mức ${maxDaily} ký tự/ngày! Hôm nay bạn chỉ còn ${remainingToday} ký tự. Hạn mức sẽ tự động làm mới 2,000 ký tự vào lúc 00:00 đêm nay.` 
+                    error: `⚠️ Bạn đã dùng vượt hạn mức ${maxDaily.toLocaleString()} ký tự/ngày! Hôm nay bạn chỉ còn ${remainingToday.toLocaleString()} ký tự. Hạn mức sẽ tự động làm mới vào 00:00 đêm nay.` 
                 });
             }
 
             // Trừ token thực và lưu vào MongoDB Atlas
             user.dailyTokensUsed += charCount;
-            user.tokens = Math.max(0, maxDaily - user.dailyTokensUsed);
+            user.tokens = Math.max(0, user.tokens - charCount);
             await user.save();
 
             // 1. Sinh Stream âm thanh từ TTS Engine

@@ -50,18 +50,24 @@ class PromoAdminController {
                 return res.status(404).json({ error: 'Gói dịch vụ không tồn tại' });
             }
 
-            // 1. Nâng cấp Hạng (Tier) và Quyền lợi của User
+            // 1. Nâng cấp Hạng (Tier) và Quyền lợi của User theo ĐÚNG gói mà user đã chọn
+            const durationDays = 30; // Mặc định 30 ngày sử dụng cho gói khuyến mãi
+            const expiresAt = new Date(Date.now() + durationDays * 24 * 60 * 60 * 1000);
+
             user.tier = plan.code;
-            user.tokens = plan.tokensPerMonth || 2000000;
-            user.dailyTokenLimit = plan.tokensPerMonth || 2000000;
+            user.tokens = (user.tokens || 0) + (plan.tokensPerMonth || 2000000);
+            user.dailyTokenLimit = Math.max(user.dailyTokenLimit || 0, plan.tokensPerMonth || 2000000);
             user.maxCharsPerRequest = plan.maxCharsPerRequest || 20000;
+            user.planExpiresAt = expiresAt;
 
             // Lịch sử đăng ký của User
             user.subscriptionHistory.unshift({
                 planName: `Gói ${plan.name} (TikTok Promotion)`,
                 tier: plan.code,
                 tokensGranted: plan.tokensPerMonth,
-                price: '0 VNĐ (TikTok Promo)'
+                price: '0 VNĐ (TikTok Promo)',
+                createdAt: new Date(),
+                expiresAt: expiresAt
             });
 
             await user.save();
@@ -100,7 +106,7 @@ class PromoAdminController {
                     codeLabel: 'SỐ TOKEN ĐƯỢC CẤP',
                     codeValue: `${(plan.tokensPerMonth || 200000).toLocaleString('vi-VN')} TOKEN`,
                     actionText: 'VÀO STUDIO TẠO GIỌNG NÓI',
-                    actionUrl: 'http://localhost:5173/studio',
+                    actionUrl: `${process.env.CLIENT_URL || 'https://veltrixvoice.autos'}/studio`,
                     footerNote: adminNote ? `Ghi chú từ quản trị viên: ${adminNote}` : null
                 });
             } catch (emailErr) {
@@ -147,7 +153,7 @@ class PromoAdminController {
                             </div>
                         `,
                         actionText: 'GỬI LẠI YÊU CẦU MỚI',
-                        actionUrl: 'http://localhost:5173/studio',
+                        actionUrl: `${process.env.CLIENT_URL || 'https://veltrixvoice.autos'}/studio`,
                         footerNote: 'Bạn vui lòng kiểm tra lại link bài đăng và cập nhật lại trên trang web nhé.'
                     });
                 } catch (emailErr) {

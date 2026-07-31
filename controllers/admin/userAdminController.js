@@ -22,7 +22,6 @@ class UserAdminController {
                 return res.status(404).json({ error: 'Không tìm thấy người dùng!' });
             }
 
-            if (tokens !== undefined) user.tokens = tokens;
             if (req.body.tier !== undefined) {
                 user.tier = req.body.tier;
                 // Lấy thông tin gói tương ứng để update các giới hạn
@@ -31,6 +30,16 @@ class UserAdminController {
                 if (plan) {
                     user.maxCharsPerRequest = plan.maxCharsPerRequest;
                     user.dailyTokenLimit = plan.tokensPerMonth;
+                    // Tự động cộng/nâng token lên bằng dung lượng gói mới nếu chưa đạt
+                    if (tokens === undefined || Number(tokens) < plan.tokensPerMonth) {
+                        user.tokens = plan.tokensPerMonth;
+                    }
+                }
+            }
+            if (tokens !== undefined && (req.body.tier === undefined || Number(tokens) > user.tokens)) {
+                user.tokens = Number(tokens);
+                if (!user.dailyTokenLimit || user.dailyTokenLimit < Number(tokens)) {
+                    user.dailyTokenLimit = Number(tokens);
                 }
             }
             if (req.body.status !== undefined) user.status = req.body.status;

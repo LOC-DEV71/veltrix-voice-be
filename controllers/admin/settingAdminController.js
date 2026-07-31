@@ -102,7 +102,7 @@ class SettingAdminController {
                 codeLabel: 'MÃ XÁC THỰC CỦA BẠN',
                 codeValue: '5 9 9 7 6 5',
                 actionText: 'VÀO STUDIO NGAY',
-                actionUrl: 'http://localhost:5173/studio',
+                actionUrl: `${process.env.CLIENT_URL || 'https://veltrixvoice.autos'}/studio`,
                 footerNote: 'Đây là thư kiểm tra tự động từ Admin Settings.'
             });
 

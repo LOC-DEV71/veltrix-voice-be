@@ -21,7 +21,7 @@ const userSchema = new mongoose.Schema({
     },
     tier: {
         type: String,
-        enum: ['FREE', 'PRO', 'VIP'],
+        enum: ['FREE', 'BASIC', 'CREATOR', 'PRO', 'VIP', 'CUSTOM'],
         default: 'FREE'
     },
     status: {
@@ -49,6 +49,10 @@ const userSchema = new mongoose.Schema({
         type: Number,
         default: 1000
     },
+    planExpiresAt: {
+        type: Date,
+        default: null
+    },
     lastLoginIp: {
         type: String,
         default: ''
@@ -59,6 +63,7 @@ const userSchema = new mongoose.Schema({
         tokensGranted: { type: Number, required: true },
         price: { type: String, default: '0 VNĐ' },
         createdAt: { type: Date, default: Date.now },
+        expiresAt: { type: Date },
         status: { type: String, default: 'Hoàn thành' }
     }]
 }, {
