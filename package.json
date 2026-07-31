@@ -1,0 +1,23 @@
+{
+  "name": "voice-saas-be",
+  "version": "1.0.0",
+  "description": "Backend API cho hệ thống Voice Generator SaaS",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.10.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^17.4.2",
+    "express": "^4.21.2",
+    "google-auth-library": "^11.0.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.9.0",
+    "msedge-tts": "^2.0.4",
+    "nodemailer": "^9.0.3"
+  }
+}
