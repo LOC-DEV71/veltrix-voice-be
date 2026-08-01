@@ -9,6 +9,7 @@ const planRoutes = require('./planRoutes');
 const promoRoutes = require('./promoRoutes');
 const settingRoutes = require('./settingRoutes');
 const apiKeyRoutes = require('./apiKeyRoutes');
+const pageRoutes = require('./pageRoutes');
 
 router.use('/auth', authRoutes);
 router.use('/voices', voiceRoutes);
@@ -18,5 +19,6 @@ router.use('/plans', planRoutes);
 router.use('/promo', promoRoutes);
 router.use('/settings', settingRoutes);
 router.use('/apikeys', apiKeyRoutes);
+router.use('/pages', pageRoutes);
 
 module.exports = router;

@@ -10,6 +10,7 @@ const planRoutes = require('./planRoutes');
 const roleRoutes = require('./roleRoutes');
 const promoAdminRoutes = require('./promoAdminRoutes');
 const settingAdminRoutes = require('./settingAdminRoutes');
+const pageAdminRoutes = require('./pageAdminRoutes');
 
 // 1. Account & Auth Routes (Tự xử lý public login và protected /me)
 router.use('/auth', accountRoutes);
@@ -23,5 +24,6 @@ router.use('/plans', planRoutes);
 router.use('/roles', roleRoutes);
 router.use('/promos', promoAdminRoutes);
 router.use('/settings', settingAdminRoutes);
+router.use('/pages', pageAdminRoutes);
 
 module.exports = router;
