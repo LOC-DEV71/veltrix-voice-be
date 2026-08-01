@@ -11,38 +11,23 @@ const app = express();
 // Kết nối MongoDB Atlas
 connectDB();
 
-// 1. CORS mở hoàn toàn cho SDK Widget (/api/sdk/*) để hỗ trợ mọi Domain, Localhost và file:///
-app.use('/api/sdk', (req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, x-api-key, Authorization');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+// 1. CORS Universal Middleware: Hỗ trợ 100% mọi Domain, Localhost, Vercel, Railway và file:///
+app.use((req, res, next) => {
+    const origin = req.headers.origin;
+    if (origin && origin !== 'null') {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+    } else {
+        res.setHeader('Access-Control-Allow-Origin', '*');
+    }
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, x-api-key, Authorization');
+
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
     }
     next();
 });
-
-// CORS Credentials linh hoạt cho môi trường Deploy (Vercel, Render, Localhost)
-const allowedOrigins = [
-    'http://localhost:5173',
-    'http://127.0.0.1:5173',
-    'http://localhost:3000',
-    process.env.CLIENT_URL,
-    process.env.FRONTEND_URL
-].filter(Boolean);
-
-app.use(cors({
-    origin: function (origin, callback) {
-        // Cho phép các request không có origin (ví dụ curl, Postman hoặc server-side call)
-        if (!origin) return callback(null, true);
-        
-        if (allowedOrigins.includes(origin) || /\.vercel\.app$/.test(origin) || /\.render\.com$/.test(origin)) {
-            return callback(null, true);
-        }
-        return callback(null, true); // Tự động chấp nhận CORS cho môi trường Deploy
-    },
-    credentials: true
-}));
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
