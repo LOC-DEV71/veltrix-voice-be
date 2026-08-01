@@ -11,6 +11,17 @@ const app = express();
 // Kết nối MongoDB Atlas
 connectDB();
 
+// 1. CORS mở hoàn toàn cho SDK Widget (/api/sdk/*) để hỗ trợ mọi Domain, Localhost và file:///
+app.use('/api/sdk', (req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, x-api-key, Authorization');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
+    next();
+});
+
 // CORS Credentials linh hoạt cho môi trường Deploy (Vercel, Render, Localhost)
 const allowedOrigins = [
     'http://localhost:5173',
