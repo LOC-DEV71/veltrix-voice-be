@@ -45,21 +45,18 @@ const pageContentSchema = new mongoose.Schema({
     card3DescVi: { type: String, default: 'Sử dụng file MP3 tạo ra cho các dự án kiếm tiền YouTube, TikTok Ads mà không lo bị vi phạm bản quyền.' },
     card3DescEn: { type: String, default: 'Use the generated MP3 files for monetized YouTube and TikTok Ads projects without worrying about copyright infringement.' },
 
-    // FAQ Section
+    // Dynamic FAQ Section Array
     faqTagVi: { type: String, default: 'GIẢI ĐÁP THẮC MẮC' },
     faqTagEn: { type: String, default: 'FREQUENTLY ASKED QUESTIONS' },
     faqTitleVi: { type: String, default: 'Câu Hỏi Thường Gặp (FAQ)' },
     faqTitleEn: { type: String, default: 'Frequently Asked Questions (FAQ)' },
     
-    faqQ1Vi: { type: String, default: 'Giọng đọc AI tại đây có bản quyền không?' },
-    faqQ1En: { type: String, default: 'Are AI generated voices royalty-free?' },
-    faqA1Vi: { type: String, default: 'Tất cả các file âm thanh được tạo ra tại Veltrix Voice đều thuộc quyền sở hữu của bạn. Bạn hoàn toàn có thể sử dụng làm video thương mại trên YouTube, TikTok, Facebook mà không lo vi phạm bản quyền.' },
-    faqA1En: { type: String, default: 'All audio files generated on Veltrix Voice belong entirely to you. You can use them freely on commercial videos for YouTube, TikTok, Facebook without copyright issues.' },
-
-    faqQ2Vi: { type: String, default: 'Cách tính hạn mức sử dụng như thế nào?' },
-    faqQ2En: { type: String, default: 'How does the daily character limit work?' },
-    faqA2Vi: { type: String, default: 'Mỗi tài khoản miễn phí sẽ được cấp hạn mức 2,000 ký tự mỗi ngày. Hạn mức sẽ tự động được làm mới lại 2,000 ký tự vào 00:00 đêm hàng ngày.' },
-    faqA2En: { type: String, default: 'Every free account is granted 2,000 characters daily. The character limit is automatically reset to 2,000 characters at 00:00 UTC daily.' },
+    faqs: [{
+        qVi: { type: String, default: '' },
+        qEn: { type: String, default: '' },
+        aVi: { type: String, default: '' },
+        aEn: { type: String, default: '' }
+    }],
 
     // Footer Section
     footerVi: { type: String, default: '© 2026 Veltrix Voice Platform. Tất cả quyền được bảo lưu. Phát triển trên nền tảng React & Node.js MVC.' },
