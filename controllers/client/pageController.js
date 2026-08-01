@@ -26,6 +26,9 @@ const DEFAULT_TRANSLATIONS = {
         card2Desc: 'Hệ thống Server Cloud mạnh mẽ giúp chuyển đổi văn bản 1,000 ký tự thành MP3 chỉ trong chưa đầy 2 giây.',
         card3Title: 'Bản Quyền Thương Mại',
         card3Desc: 'Sử dụng file MP3 tạo ra cho các dự án kiếm tiền YouTube, TikTok Ads mà không lo bị vi phạm bản quyền.',
+        voicesTitle: 'Khám Phá Các Giọng Đọc Đầy Cảm Xúc',
+        pricingTag: 'BẢNG GIÁ MINH BẠCH',
+        pricingTitle: 'Lựa Chọn Gói Phù Hợp Với Bạn',
         faqTag: 'GIẢI ĐÁP THẮC MẮC',
         faqTitle: 'Câu Hỏi Thường Gặp (FAQ)',
         faqs: [],
@@ -56,6 +59,9 @@ const DEFAULT_TRANSLATIONS = {
         card2Desc: 'Powerful Cloud Server system converts 1,000 characters of text into MP3 in less than 2 seconds.',
         card3Title: 'Commercial Rights',
         card3Desc: 'Use the generated MP3 files for monetized YouTube and TikTok Ads projects without worrying about copyright infringement.',
+        voicesTitle: 'Discover Emotional AI Voices',
+        pricingTag: 'TRANSPARENT PRICING',
+        pricingTitle: 'Choose The Right Plan For You',
         faqTag: 'FREQUENTLY ASKED QUESTIONS',
         faqTitle: 'Frequently Asked Questions (FAQ)',
         faqs: [],
@@ -70,7 +76,10 @@ const DEFAULT_TRANSLATIONS = {
         navFaq: 'よくある質問',
         navDonate: '寄付ボタン ☕',
         navStudio: 'Studioへ 🚀',
-        navLogout: 'ログアウト'
+        navLogout: 'ログアウト',
+        voicesTitle: '感情豊かなAI声を探索する',
+        pricingTag: '明瞭な料金プラン',
+        pricingTitle: 'あなたに最適なプランを選択'
     },
     ko: {
         navHome: '홈',
@@ -81,7 +90,10 @@ const DEFAULT_TRANSLATIONS = {
         navFaq: '자주 묻는 질문',
         navDonate: '커피 후원 ☕',
         navStudio: '스튜디오 시작 🚀',
-        navLogout: '로그아웃'
+        navLogout: '로그아웃',
+        voicesTitle: '감정이 풍부한 AI 음성 둘러보기',
+        pricingTag: '투명한 요금제',
+        pricingTitle: '나에게 맞는 플랜 선택'
     },
     zh: {
         navHome: '首页',
@@ -92,7 +104,10 @@ const DEFAULT_TRANSLATIONS = {
         navFaq: '常见问题',
         navDonate: '赞助咖啡 ☕',
         navStudio: '进入 Studio 🚀',
-        navLogout: '退出登录'
+        navLogout: '退出登录',
+        voicesTitle: '探索充满情感的 AI 语音',
+        pricingTag: '透明价格方案',
+        pricingTitle: '选择适合您的方案'
     },
     fr: {
         navHome: 'Accueil',
@@ -103,7 +118,10 @@ const DEFAULT_TRANSLATIONS = {
         navFaq: 'FAQ',
         navDonate: 'Offrir un café ☕',
         navStudio: 'Lancer Studio 🚀',
-        navLogout: 'Déconnexion'
+        navLogout: 'Déconnexion',
+        voicesTitle: 'Découvrez des voix IA émouvantes',
+        pricingTag: 'TARIFICATION TRANSPARENTE',
+        pricingTitle: 'Choisissez le forfait qui vous convient'
     }
 };
 
