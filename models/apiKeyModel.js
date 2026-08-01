@@ -25,7 +25,11 @@ const apiKeySchema = new mongoose.Schema({
     lastUsedAt: {
         type: Date,
         default: null
-    }
+    },
+    allowedDomains: [{
+        type: String,
+        trim: true
+    }]
 });
 
 module.exports = mongoose.model('ApiKey', apiKeySchema);

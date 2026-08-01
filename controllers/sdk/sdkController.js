@@ -22,6 +22,30 @@ class SdkController {
                 return res.status(403).json({ error: "Tài khoản của bạn đang bị tạm khóa." });
             }
 
+            // Kiểm tra Tên Miền Cho Phép (Domain Whitelist Security)
+            if (keyDoc.allowedDomains && keyDoc.allowedDomains.length > 0) {
+                const rawOrigin = req.headers.origin || req.headers.referer || '';
+                if (rawOrigin && rawOrigin !== 'null') {
+                    let domainHost = '';
+                    try {
+                        domainHost = new URL(rawOrigin).hostname;
+                    } catch (e) {
+                        domainHost = rawOrigin.replace(/^https?:\/\//, '').split('/')[0].split(':')[0];
+                    }
+
+                    const isAllowed = keyDoc.allowedDomains.some(d => {
+                        const cleanAllowed = d.replace(/^https?:\/\//, '').split('/')[0].split(':')[0].toLowerCase();
+                        return domainHost.toLowerCase() === cleanAllowed || domainHost.toLowerCase().endsWith('.' + cleanAllowed);
+                    });
+
+                    if (!isAllowed) {
+                        return res.status(403).json({
+                            error: `⛔ Tên miền (${domainHost || 'Unspecified'}) không được phép sử dụng API Key này! Vui lòng cấu hình tên miền trong trang Dashboard.`
+                        });
+                    }
+                }
+            }
+
             // Cập nhật ngày sử dụng cuối
             keyDoc.lastUsedAt = new Date();
             await keyDoc.save();
