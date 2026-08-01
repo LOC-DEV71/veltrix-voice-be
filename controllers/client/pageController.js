@@ -2,17 +2,20 @@ const PageContent = require('../../models/pageContentModel');
 
 const DEFAULT_TRANSLATIONS = {
     vi: {
+        navHome: 'Trang chủ',
+        navDashboard: 'Dashboard',
         navFeatures: 'Tính năng',
         navVoices: 'Giọng đọc AI',
         navPricing: 'Bảng giá',
         navFaq: 'Hỏi đáp',
         navDonate: 'Donate Cà Phê ☕',
         navStudio: 'Vào Studio 🚀',
+        navLogout: 'Đăng xuất',
         heroBadge: 'Công Nghệ Chuyển Văn Bản Thành Giọng Nói AI Đỉnh Cao',
         heroTitle: 'Tạo Giọng Đọc AI',
         heroTitleHl1: 'Sống Động',
         heroTitleHl2: 'Tự Nhiên Như Người Thật',
-        heroSubtitle: 'Nền tảng Veltrix Voice giúp bạn biến mọi văn bản thành file âm thanh MP3 chất lượng cao chỉ trong vài giây. Phù hợp làm video YouTube, TikTok, Đọc sách nói & Quảng cáo.',
+        heroSubtitle: 'Nền tảng Veltrix Voice giúp bạn biến mọi văn bản thành file âm thanh MP3 chất lượng cao chỉ trong vài giây.',
         heroCtaMain: 'Dùng Thử Ngay Bây Giờ',
         heroCtaSecondary: 'Nghe Mẫu Giọng Đọc',
         featuresTag: 'TÍNH NĂNG VƯỢT TRỘI',
@@ -25,25 +28,19 @@ const DEFAULT_TRANSLATIONS = {
         card3Desc: 'Sử dụng file MP3 tạo ra cho các dự án kiếm tiền YouTube, TikTok Ads mà không lo bị vi phạm bản quyền.',
         faqTag: 'GIẢI ĐÁP THẮC MẮC',
         faqTitle: 'Câu Hỏi Thường Gặp (FAQ)',
-        faqs: [
-            {
-                q: 'Giọng đọc AI tại đây có bản quyền không?',
-                a: 'Tất cả các file âm thanh được tạo ra tại Veltrix Voice đều thuộc quyền sở hữu của bạn. Bạn hoàn toàn có thể sử dụng làm video thương mại trên YouTube, TikTok, Facebook mà không lo vi phạm bản quyền.'
-            },
-            {
-                q: 'Cách tính hạn mức sử dụng như thế nào?',
-                a: 'Mỗi tài khoản miễn phí sẽ được cấp hạn mức 2,000 ký tự mỗi ngày. Hạn mức sẽ tự động được làm mới lại 2,000 ký tự vào 00:00 đêm hàng ngày.'
-            }
-        ],
+        faqs: [],
         footer: '© 2026 Veltrix Voice Platform. Tất cả quyền được bảo lưu.'
     },
     en: {
+        navHome: 'Home',
+        navDashboard: 'Dashboard',
         navFeatures: 'Features',
         navVoices: 'AI Voices',
         navPricing: 'Pricing',
         navFaq: 'FAQ',
         navDonate: 'Buy me a Coffee ☕',
         navStudio: 'Try Studio 🚀',
+        navLogout: 'Logout',
         heroBadge: 'Top-tier AI Text-to-Speech Technology',
         heroTitle: 'Create AI Voices',
         heroTitleHl1: 'Vivid',
@@ -61,17 +58,52 @@ const DEFAULT_TRANSLATIONS = {
         card3Desc: 'Use the generated MP3 files for monetized YouTube and TikTok Ads projects without worrying about copyright infringement.',
         faqTag: 'FREQUENTLY ASKED QUESTIONS',
         faqTitle: 'Frequently Asked Questions (FAQ)',
-        faqs: [
-            {
-                q: 'Are AI generated voices royalty-free?',
-                a: 'All audio files generated on Veltrix Voice belong entirely to you. You can use them freely on commercial videos for YouTube, TikTok, Facebook without copyright issues.'
-            },
-            {
-                q: 'How does the daily character limit work?',
-                a: 'Every free account is granted 2,000 characters daily. The character limit is automatically reset to 2,000 characters at 00:00 UTC daily.'
-            }
-        ],
+        faqs: [],
         footer: '© 2026 Veltrix Voice Platform. All rights reserved.'
+    },
+    ja: {
+        navHome: 'ホーム',
+        navDashboard: 'ダッシュボード',
+        navFeatures: '機能',
+        navVoices: 'AI音声',
+        navPricing: '料金プラン',
+        navFaq: 'よくある質問',
+        navDonate: '寄付ボタン ☕',
+        navStudio: 'Studioへ 🚀',
+        navLogout: 'ログアウト'
+    },
+    ko: {
+        navHome: '홈',
+        navDashboard: '대시보드',
+        navFeatures: '기능',
+        navVoices: 'AI 음성',
+        navPricing: '요금제',
+        navFaq: '자주 묻는 질문',
+        navDonate: '커피 후원 ☕',
+        navStudio: '스튜디오 시작 🚀',
+        navLogout: '로그아웃'
+    },
+    zh: {
+        navHome: '首页',
+        navDashboard: '仪表板',
+        navFeatures: '功能特点',
+        navVoices: 'AI 语音',
+        navPricing: '价格方案',
+        navFaq: '常见问题',
+        navDonate: '赞助咖啡 ☕',
+        navStudio: '进入 Studio 🚀',
+        navLogout: '退出登录'
+    },
+    fr: {
+        navHome: 'Accueil',
+        navDashboard: 'Tableau de bord',
+        navFeatures: 'Fonctionnalités',
+        navVoices: 'Voix IA',
+        navPricing: 'Tarifs',
+        navFaq: 'FAQ',
+        navDonate: 'Offrir un café ☕',
+        navStudio: 'Lancer Studio 🚀',
+        navLogout: 'Déconnexion'
     }
 };
 
@@ -82,8 +114,19 @@ class ClientPageController {
             let page = await PageContent.findOne({ slug: slug || 'landing' });
             if (!page) {
                 page = await PageContent.create({ slug: slug || 'landing', translations: DEFAULT_TRANSLATIONS });
-            } else if (!page.translations || Object.keys(page.translations).length === 0) {
-                page.translations = DEFAULT_TRANSLATIONS;
+            } else {
+                let translationsObj = page.translations ? (page.translations instanceof Map ? Object.fromEntries(page.translations) : page.translations) : {};
+                Object.keys(DEFAULT_TRANSLATIONS).forEach(lang => {
+                    if (!translationsObj[lang]) {
+                        translationsObj[lang] = DEFAULT_TRANSLATIONS[lang];
+                    } else {
+                        translationsObj[lang] = {
+                            ...DEFAULT_TRANSLATIONS[lang],
+                            ...translationsObj[lang]
+                        };
+                    }
+                });
+                page.translations = translationsObj;
             }
             return res.json({ success: true, page });
         } catch (err) {
