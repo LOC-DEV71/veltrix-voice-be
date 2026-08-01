@@ -9,7 +9,8 @@ class ClientTtsController {
     // Nghe thử giọng đọc — CHỈ phát audio mẫu, KHÔNG trừ token, KHÔNG lưu lịch sử
     static async preview(req, res) {
         try {
-            const { text, voice, rate, pitch } = req.body;
+            const { text, voice: rawVoice, voiceId, rate, pitch } = req.body;
+            const voice = rawVoice || voiceId || 'vi-VN-HoaiMyNeural';
 
             // Giới hạn mẫu nghe thử tối đa 200 ký tự để tránh lạm dụng
             const sampleText = (text || '').slice(0, 200);
@@ -31,7 +32,8 @@ class ClientTtsController {
 
     static async generate(req, res) {
         try {
-            const { text, voice, rate, pitch, title, folder } = req.body;
+            const { text, voice: rawVoice, voiceId, rate, pitch, title, folder } = req.body;
+            const voice = rawVoice || voiceId || 'vi-VN-HoaiMyNeural';
             const user = req.user;
 
             if (!text || typeof text !== 'string' || text.trim().length === 0) {
@@ -80,12 +82,12 @@ class ClientTtsController {
             // 1. Sinh âm thanh siêu tốc từ Smart Hybrid TTS Engine (0.7s - 1.2s)
             const audioBuffer = await generateSpeechBuffer(text, voice, { rate, pitch });
 
-            // 2. Upload Cloudinary kèm Timeout 3.5s chống nghẽn đường truyền
+            // 2. Upload Cloudinary kèm Timeout 12s
             let cloudAudioUrl = '';
             try {
                 const cloudPromise = uploadAudioBufferToCloudinary(audioBuffer);
                 const timeoutPromise = new Promise((_, reject) => 
-                    setTimeout(() => reject(new Error('Cloudinary Timeout (3.5s)')), 3500)
+                    setTimeout(() => reject(new Error('Cloudinary Timeout (12s)')), 12000)
                 );
                 cloudAudioUrl = await Promise.race([cloudPromise, timeoutPromise]);
             } catch (cloudErr) {
@@ -93,7 +95,7 @@ class ClientTtsController {
             }
 
             // 3. Lưu lịch sử tạo Audio thực vào Bảng AudioLog MongoDB Atlas
-            const newAudioLog = await AudioLog.create({
+            const newAudioLog = new AudioLog({
                 user: user._id,
                 text,
                 voiceId: voice,
@@ -105,11 +107,28 @@ class ClientTtsController {
                 folder: folder && folder.trim() ? folder.trim() : 'Mặc định'
             });
 
-            // 4. Trả về MP3 Buffer ngay lập tức cho client
+            // Nếu Cloudinary bị chậm hoặc chưa có URL, đặt fallback URL stream tức thì
+            if (!cloudAudioUrl) {
+                newAudioLog.audioUrl = `/api/client/tts/history/stream/${newAudioLog._id}`;
+            }
+
+            await newAudioLog.save();
+
+            // Nếu là cuộc gọi từ SDK API hoặc Yêu cầu JSON, trả về object JSON chứa audioUrl và Token còn lại
+            if (req.isSdkCall || req.headers['accept']?.includes('application/json') || req.query.responseType === 'json') {
+                return res.json({
+                    success: true,
+                    audioUrl: newAudioLog.audioUrl,
+                    remainingTokens: user.tokens,
+                    audioId: newAudioLog._id
+                });
+            }
+
+            // 4. Trả về MP3 Buffer ngay lập tức cho client Studio
             res.set({
                 'Content-Type': 'audio/mpeg',
                 'X-Remaining-Tokens': user.tokens,
-                'X-Audio-Url': cloudAudioUrl,
+                'X-Audio-Url': newAudioLog.audioUrl,
                 'X-Audio-Id': newAudioLog._id
             });
 
@@ -128,10 +147,56 @@ class ClientTtsController {
             const logs = await AudioLog.find({ user: req.user._id })
                 .sort({ createdAt: -1 })
                 .limit(50);
+
+            // Đảm bảo bài đọc nào cũng có audioUrl hợp lệ (nếu rỗng thì gán link stream fallback)
+            const sanitizedLogs = logs.map(log => {
+                const item = log.toObject();
+                if (!item.audioUrl) {
+                    item.audioUrl = `/api/client/tts/history/stream/${item._id}`;
+                }
+                return item;
+            });
             
-            return res.json({ history: logs });
+            return res.json({ history: sanitizedLogs });
         } catch (err) {
             return res.status(500).json({ error: "Lỗi lấy lịch sử audio: " + err.message });
+        }
+    }
+
+    // Phát lại âm thanh từ Lịch sử (Stream Fallback nếu mất link Cloudinary)
+    static async streamHistoryAudio(req, res) {
+        try {
+            const { id } = req.params;
+            const log = await AudioLog.findById(id);
+            if (!log) {
+                return res.status(404).json({ error: "Không tìm thấy bài đọc!" });
+            }
+
+            // Nếu đã có Cloudinary URL thật, redirect trực tiếp
+            if (log.audioUrl && log.audioUrl.startsWith('http')) {
+                return res.redirect(log.audioUrl);
+            }
+
+            // Fallback: Sinh lại audio stream tức thì từ text & voiceId trong DB
+            const audioStream = await generateSpeechStream(log.text, log.voiceId);
+            res.set({ 'Content-Type': 'audio/mpeg' });
+            audioStream.pipe(res);
+
+            // Tự động upload Cloudinary ngầm để lần sau phát tức thì
+            generateSpeechBuffer(log.text, log.voiceId)
+                .then(buf => uploadAudioBufferToCloudinary(buf))
+                .then(url => {
+                    if (url) {
+                        log.audioUrl = url;
+                        log.save();
+                    }
+                })
+                .catch(e => console.error("Ngầm upload Cloudinary thất bại:", e.message));
+        } catch (err) {
+            console.error("Stream History Audio Error:", err);
+            if (!res.headersSent) {
+                res.status(500).json({ error: "Lỗi phát lại audio: " + err.message });
+            }
         }
     }
 
@@ -143,6 +208,46 @@ class ClientTtsController {
             return res.json({ success: true, message: "Đã xóa bài đọc thành công" });
         } catch (err) {
             return res.status(500).json({ error: "Lỗi xóa bài đọc: " + err.message });
+        }
+    }
+
+    // Cập nhật Thư mục cho Bài đọc (Di chuyển thư mục)
+    static async updateAudioFolder(req, res) {
+        try {
+            const { id } = req.params;
+            const { folder } = req.body;
+
+            const log = await AudioLog.findOne({ _id: id, user: req.user._id });
+            if (!log) {
+                return res.status(404).json({ error: "Không tìm thấy bài đọc!" });
+            }
+
+            log.folder = folder && folder.trim() ? folder.trim() : 'Mặc định';
+            await log.save();
+
+            return res.json({ success: true, message: `Đã chuyển bài đọc sang thư mục "${log.folder}"`, log });
+        } catch (err) {
+            return res.status(500).json({ error: "Lỗi chuyển thư mục: " + err.message });
+        }
+    }
+
+    // Cập nhật Tiêu đề cho Bài đọc (Đổi tên file/dự án)
+    static async updateAudioTitle(req, res) {
+        try {
+            const { id } = req.params;
+            const { title } = req.body;
+
+            const log = await AudioLog.findOne({ _id: id, user: req.user._id });
+            if (!log) {
+                return res.status(404).json({ error: "Không tìm thấy bài đọc!" });
+            }
+
+            log.title = title ? title.trim() : '';
+            await log.save();
+
+            return res.json({ success: true, message: `Đã đổi tên bài đọc thành "${log.title}"`, log });
+        } catch (err) {
+            return res.status(500).json({ error: "Lỗi đổi tên bài đọc: " + err.message });
         }
     }
 

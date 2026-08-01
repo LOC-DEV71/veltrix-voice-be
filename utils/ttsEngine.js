@@ -67,11 +67,9 @@ async function fetchGoogleTTSBuffer(text, language = 'vi') {
 }
 
 /**
- * Sinh mp3 buffer cho 1 chunk duy nhất qua EdgeTTS
+ * Sinh mp3 buffer cho 1 chunk duy nhất qua EdgeTTS kèm retry
  */
 async function generateEdgeChunkBuffer(chunkText, voice, lang, options, scratchDir) {
-    const tempFile = path.join(scratchDir, `tts_chunk_${Date.now()}_${crypto.randomBytes(4).toString('hex')}.mp3`);
-    
     let rateString = '0%';
     if (options.rate !== undefined && options.rate !== 1) {
         const ratePercent = Math.round((options.rate - 1) * 100);
@@ -79,30 +77,48 @@ async function generateEdgeChunkBuffer(chunkText, voice, lang, options, scratchD
     }
 
     let pitchString = '0Hz';
-    if (options.pitch !== undefined && options.pitch !== '+0Hz') {
-        pitchString = options.pitch;
+    if (options.pitch !== undefined && options.pitch !== '+0Hz' && options.pitch !== '0Hz') {
+        if (typeof options.pitch === 'number') {
+            pitchString = options.pitch >= 0 ? `+${options.pitch}Hz` : `${options.pitch}Hz`;
+        } else if (typeof options.pitch === 'string') {
+            let pStr = options.pitch.replace('Hz', '').trim();
+            const pVal = parseInt(pStr);
+            if (!isNaN(pVal)) {
+                pitchString = pVal >= 0 ? `+${pVal}Hz` : `${pVal}Hz`;
+            }
+        }
     }
 
-    const tts = new EdgeTTS({
-        voice,
-        lang,
-        outputFormat: 'audio-24khz-96kbitrate-mono-mp3',
-        rate: rateString,
-        pitch: pitchString
-    });
+    // Thử lại 2 lần trước khi bỏ cuộc
+    for (let attempt = 1; attempt <= 2; attempt++) {
+        const tempFile = path.join(scratchDir, `tts_chunk_${Date.now()}_${crypto.randomBytes(4).toString('hex')}.mp3`);
+        try {
+            const tts = new EdgeTTS({
+                voice,
+                lang,
+                outputFormat: 'audio-24khz-96kbitrate-mono-mp3',
+                rate: rateString,
+                pitch: pitchString
+            });
 
-    await tts.ttsPromise(chunkText, tempFile);
+            await tts.ttsPromise(chunkText, tempFile);
 
-    if (fs.existsSync(tempFile)) {
-        const buf = fs.readFileSync(tempFile);
-        try { fs.unlinkSync(tempFile); } catch(e) {}
-        if (buf && buf.length > 0) return buf;
+            if (fs.existsSync(tempFile)) {
+                const buf = fs.readFileSync(tempFile);
+                try { fs.unlinkSync(tempFile); } catch(e) {}
+                if (buf && buf.length > 0) return buf;
+            }
+        } catch (err) {
+            try { if (fs.existsSync(tempFile)) fs.unlinkSync(tempFile); } catch(e) {}
+            if (attempt === 2) throw err;
+            await new Promise(r => setTimeout(r, 300));
+        }
     }
-    throw new Error("Không thể tạo file chunk tạm");
+    throw new Error("EdgeTTS Chunk Failed after 2 attempts");
 }
 
 /**
- * Microsoft Neural AI Engine chuẩn Studio HD (Hỗ trợ văn bản dài vô tận)
+ * Microsoft Neural AI Engine chuẩn Studio HD (Hoài My, Nam Minh, Ava, Andrew)
  */
 async function generateSpeechBuffer(text, voice = 'vi-VN-HoaiMyNeural', options = {}) {
     const selectedVoice = voice || 'vi-VN-HoaiMyNeural';

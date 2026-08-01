@@ -14,6 +14,13 @@ router.post('/generate', authenticateToken, validateGenerateInput, checkVoiceAcc
 
 // History
 router.get('/history', authenticateToken, ClientTtsController.getHistory);
+router.get('/history/stream/:id', ClientTtsController.streamHistoryAudio);
+router.patch('/history/:id/folder', authenticateToken, ClientTtsController.updateAudioFolder);
+router.post('/history/:id/folder', authenticateToken, ClientTtsController.updateAudioFolder);
+router.put('/history/:id/folder', authenticateToken, ClientTtsController.updateAudioFolder);
+router.patch('/history/:id/title', authenticateToken, ClientTtsController.updateAudioTitle);
+router.post('/history/:id/title', authenticateToken, ClientTtsController.updateAudioTitle);
+router.put('/history/:id/title', authenticateToken, ClientTtsController.updateAudioTitle);
 router.delete('/history/:id', authenticateToken, ClientTtsController.deleteHistory);
 
 // Folders
