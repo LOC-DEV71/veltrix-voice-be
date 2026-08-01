@@ -1,6 +1,6 @@
 const PageContent = require('../../models/pageContentModel');
 
-const DEFAULT_TRANSLATIONS = {
+const LANDING_DEFAULT_TRANSLATIONS = {
     vi: {
         navHome: 'Trang chủ',
         navDashboard: 'Dashboard',
@@ -66,62 +66,83 @@ const DEFAULT_TRANSLATIONS = {
         faqTitle: 'Frequently Asked Questions (FAQ)',
         faqs: [],
         footer: '© 2026 Veltrix Voice Platform. All rights reserved.'
+    }
+};
+
+const PRICING_DEFAULT_TRANSLATIONS = {
+    vi: {
+        navHome: 'Trang chủ',
+        navDashboard: 'Dashboard',
+        navFeatures: 'Tính năng',
+        navVoices: 'Giọng đọc AI',
+        navPricing: 'Bảng giá',
+        navFaq: 'Hỏi đáp',
+        navDonate: 'Donate Cà Phê ☕',
+        navStudio: 'Vào Studio 🚀',
+        navLogout: 'Đăng xuất',
+        heroTitle: 'Nâng cấp để làm nhiều hơn',
+        heroTitleHl1: 'làm nhiều hơn',
+        heroSubtitle: 'Chọn gói dịch vụ phù hợp để tối ưu hóa quy trình sản xuất nội dung của bạn với công nghệ AI hàng đầu.',
+        cycleMonthly: 'Theo tháng',
+        cycleYearly: 'Theo năm',
+        discountBadge: 'Tiết kiệm đến 70%',
+        faqTitle: 'Câu hỏi thường gặp',
+        faqs: [
+            {
+                q: 'Tôi có thể hủy gói đăng ký bất cứ lúc nào không?',
+                a: 'Có, bạn có thể hủy gói đăng ký bất cứ lúc nào trong phần cài đặt tài khoản. Sau khi hủy, bạn vẫn có quyền truy cập vào các tính năng Pro cho đến hết chu kỳ thanh toán hiện tại.'
+            },
+            {
+                q: 'Phút / Ký tự lượt đọc có được cộng dồn sang tháng sau không?',
+                a: 'Hạn mức Token của các gói trả phí sẽ được làm mới hàng tháng và không cộng dồn. Với gói Miễn Phí, hạn mức 2,000 ký tự sẽ được tự động làm mới vào 00:00 đêm mỗi ngày.'
+            },
+            {
+                q: 'Chính sách hoàn tiền của Veltrix Voice như thế nào?',
+                a: 'Chúng tôi hỗ trợ hoàn tiền 100% trong vòng 7 ngày đầu tiên nếu bạn không hài lòng với chất lượng dịch vụ và chưa sử dụng quá 10% hạn mức Token của gói.'
+            },
+            {
+                q: 'Tôi có thể xuất file dưới định dạng nào?',
+                a: 'Tất cả các gói đều hỗ trợ xuất file định dạng âm thanh MP3 chuẩn HD sắc nét (up to 320kbps) và file nén ZIP cho bài đọc dài.'
+            }
+        ],
+        footer: '© 2026 Veltrix Voice Platform. Tất cả quyền được bảo lưu.'
     },
-    ja: {
-        navHome: 'ホーム',
-        navDashboard: 'ダッシュボード',
-        navFeatures: '機能',
-        navVoices: 'AI音声',
-        navPricing: '料金プラン',
-        navFaq: 'よくある質問',
-        navDonate: '寄付ボタン ☕',
-        navStudio: 'Studioへ 🚀',
-        navLogout: 'ログアウト',
-        voicesTitle: '感情豊かなAI声を探索する',
-        pricingTag: '明瞭な料金プラン',
-        pricingTitle: 'あなたに最適なプランを選択'
-    },
-    ko: {
-        navHome: '홈',
-        navDashboard: '대시보드',
-        navFeatures: '기능',
-        navVoices: 'AI 음성',
-        navPricing: '요금제',
-        navFaq: '자주 묻는 질문',
-        navDonate: '커피 후원 ☕',
-        navStudio: '스튜디오 시작 🚀',
-        navLogout: '로그아웃',
-        voicesTitle: '감정이 풍부한 AI 음성 둘러보기',
-        pricingTag: '투명한 요금제',
-        pricingTitle: '나에게 맞는 플랜 선택'
-    },
-    zh: {
-        navHome: '首页',
-        navDashboard: '仪表板',
-        navFeatures: '功能特点',
-        navVoices: 'AI 语音',
-        navPricing: '价格方案',
-        navFaq: '常见问题',
-        navDonate: '赞助咖啡 ☕',
-        navStudio: '进入 Studio 🚀',
-        navLogout: '退出登录',
-        voicesTitle: '探索充满情感的 AI 语音',
-        pricingTag: '透明价格方案',
-        pricingTitle: '选择适合您的方案'
-    },
-    fr: {
-        navHome: 'Accueil',
-        navDashboard: 'Tableau de bord',
-        navFeatures: 'Fonctionnalités',
-        navVoices: 'Voix IA',
-        navPricing: 'Tarifs',
+    en: {
+        navHome: 'Home',
+        navDashboard: 'Dashboard',
+        navFeatures: 'Features',
+        navVoices: 'AI Voices',
+        navPricing: 'Pricing',
         navFaq: 'FAQ',
-        navDonate: 'Offrir un café ☕',
-        navStudio: 'Lancer Studio 🚀',
-        navLogout: 'Déconnexion',
-        voicesTitle: 'Découvrez des voix IA émouvantes',
-        pricingTag: 'TARIFICATION TRANSPARENTE',
-        pricingTitle: 'Choisissez le forfait qui vous convient'
+        navDonate: 'Buy me a Coffee ☕',
+        navStudio: 'Try Studio 🚀',
+        navLogout: 'Logout',
+        heroTitle: 'Upgrade to do more',
+        heroTitleHl1: 'do more',
+        heroSubtitle: 'Choose the right plan to optimize your content production workflow with leading AI technology.',
+        cycleMonthly: 'Monthly',
+        cycleYearly: 'Yearly',
+        discountBadge: 'Save up to 70%',
+        faqTitle: 'Frequently Asked Questions',
+        faqs: [
+            {
+                q: 'Can I cancel my subscription at any time?',
+                a: 'Yes, you can cancel your subscription anytime in your account settings. After cancellation, you still have access to Pro features until the end of the current billing cycle.'
+            },
+            {
+                q: 'Do unused tokens roll over to the next month?',
+                a: 'Token quotas for paid plans are refreshed monthly and do not roll over. For the Free plan, the 2,000 character limit is automatically refreshed at 00:00 every day.'
+            },
+            {
+                q: 'What is the refund policy?',
+                a: 'We offer a 100% refund within the first 7 days if you are not satisfied with the service quality and have not used more than 10% of your plan token quota.'
+            },
+            {
+                q: 'What file formats can I export?',
+                a: 'All plans support exporting HD MP3 audio files (up to 320kbps) and ZIP compressed files for long readings.'
+            }
+        ],
+        footer: '© 2026 Veltrix Voice Platform. All rights reserved.'
     }
 };
 
@@ -129,17 +150,20 @@ class ClientPageController {
     static async getPageContent(req, res) {
         try {
             const { slug } = req.params;
-            let page = await PageContent.findOne({ slug: slug || 'landing' });
+            const targetSlug = slug || 'landing';
+            const defaultTranslations = targetSlug === 'pricing' ? PRICING_DEFAULT_TRANSLATIONS : LANDING_DEFAULT_TRANSLATIONS;
+
+            let page = await PageContent.findOne({ slug: targetSlug });
             if (!page) {
-                page = await PageContent.create({ slug: slug || 'landing', translations: DEFAULT_TRANSLATIONS });
+                page = await PageContent.create({ slug: targetSlug, translations: defaultTranslations });
             } else {
                 let translationsObj = page.translations ? (page.translations instanceof Map ? Object.fromEntries(page.translations) : page.translations) : {};
-                Object.keys(DEFAULT_TRANSLATIONS).forEach(lang => {
+                Object.keys(defaultTranslations).forEach(lang => {
                     if (!translationsObj[lang]) {
-                        translationsObj[lang] = DEFAULT_TRANSLATIONS[lang];
+                        translationsObj[lang] = defaultTranslations[lang];
                     } else {
                         translationsObj[lang] = {
-                            ...DEFAULT_TRANSLATIONS[lang],
+                            ...defaultTranslations[lang],
                             ...translationsObj[lang]
                         };
                     }

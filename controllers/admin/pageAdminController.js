@@ -1,6 +1,6 @@
 const PageContent = require('../../models/pageContentModel');
 
-const DEFAULT_TRANSLATIONS = {
+const LANDING_DEFAULT_TRANSLATIONS = {
     vi: {
         navHome: 'Trang chủ',
         navDashboard: 'Dashboard',
@@ -80,167 +80,111 @@ const DEFAULT_TRANSLATIONS = {
             },
             {
                 q: 'How does the daily character limit work?',
-                a: 'Every free account is granted 2,000 characters daily. The character limit is automatically reset to 2,000 characters at 00:00 UTC daily.'
+                a: 'Every free account is granted 2,000 characters daily. The character limit is automatically reset to 00:00 UTC daily.'
             }
         ],
         footer: '© 2026 Veltrix Voice Platform. All rights reserved.'
-    },
-    ja: {
-        navHome: 'ホーム',
-        navDashboard: 'ダッシュボード',
-        navFeatures: '機能',
-        navVoices: 'AI音声',
-        navPricing: '料金プラン',
-        navFaq: 'よくある質問',
-        navDonate: '寄付ボタン ☕',
-        navStudio: 'Studioへ 🚀',
-        navLogout: 'ログアウト',
-        heroBadge: '最先端のAIテキスト読み上げ技術',
-        heroTitle: 'AI声を生成',
-        heroTitleHl1: '活き活きとした',
-        heroTitleHl2: '人間のように自然な',
-        heroSubtitle: 'Veltrix Voiceプラットフォームは、あらゆるテキストをわずか数秒で高品質なMP3音声ファイルに変換します。',
-        heroCtaMain: '今すぐ試す',
-        heroCtaSecondary: 'サンプルを聴く',
-        featuresTag: '優れた機能',
-        featuresTitle: 'Veltrix Voiceを選ぶ理由',
-        card1Title: 'ニューラルAI音声',
-        card1Desc: '高度なディープラーニングモデルが自然な感情の抑揚を99%維持して正確に発音します。',
-        card2Title: '超高速処理',
-        card2Desc: '強力なクラウドサーバーシステムにより、1,000文字のテキストを2秒未満でMP3に変換します。',
-        card3Title: '商用利用権',
-        card3Desc: '生成されたMP3ファイルは著作権を気にせずYouTubeやTikTok広告で使用できます。',
-        voicesTitle: '感情豊かなAI声を探索する',
-        pricingTag: '明瞭な料金プラン',
-        pricingTitle: 'あなたに最適なプランを選択',
-        faqTag: 'よくある質問',
-        faqTitle: 'よくある質問 (FAQ)',
+    }
+};
+
+const PRICING_DEFAULT_TRANSLATIONS = {
+    vi: {
+        navHome: 'Trang chủ',
+        navDashboard: 'Dashboard',
+        navFeatures: 'Tính năng',
+        navVoices: 'Giọng đọc AI',
+        navPricing: 'Bảng giá',
+        navFaq: 'Hỏi đáp',
+        navDonate: 'Donate Cà Phê ☕',
+        navStudio: 'Vào Studio 🚀',
+        navLogout: 'Đăng xuất',
+        heroTitle: 'Nâng cấp để làm nhiều hơn',
+        heroTitleHl1: 'làm nhiều hơn',
+        heroSubtitle: 'Chọn gói dịch vụ phù hợp để tối ưu hóa quy trình sản xuất nội dung của bạn với công nghệ AI hàng đầu.',
+        cycleMonthly: 'Theo tháng',
+        cycleYearly: 'Theo năm',
+        discountBadge: 'Tiết kiệm đến 70%',
+        faqTitle: 'Câu hỏi thường gặp',
         faqs: [
             {
-                q: 'AI音声は商用利用可能ですか？',
-                a: 'はい。Veltrix Voiceで作成されたすべての音声ファイルの所有権はあなたにあります。商用動画でご自由にお使いいただけます。'
+                q: 'Tôi có thể hủy gói đăng ký bất cứ lúc nào không?',
+                a: 'Có, bạn có thể hủy gói đăng ký bất cứ lúc nào trong phần cài đặt tài khoản. Sau khi hủy, bạn vẫn có quyền truy cập vào các tính năng Pro cho đến hết chu kỳ thanh toán hiện tại.'
+            },
+            {
+                q: 'Phút / Ký tự lượt đọc có được cộng dồn sang tháng sau không?',
+                a: 'Hạn mức Token của các gói trả phí sẽ được làm mới hàng tháng và không cộng dồn. Với gói Miễn Phí, hạn mức 2,000 ký tự sẽ được tự động làm mới vào 00:00 đêm mỗi ngày.'
+            },
+            {
+                q: 'Chính sách hoàn tiền của Veltrix Voice như thế nào?',
+                a: 'Chúng tôi hỗ trợ hoàn tiền 100% trong vòng 7 ngày đầu tiên nếu bạn không hài lòng với chất lượng dịch vụ và chưa sử dụng quá 10% hạn mức Token của gói.'
+            },
+            {
+                q: 'Tôi có thể xuất file dưới định dạng nào?',
+                a: 'Tất cả các gói đều hỗ trợ xuất file định dạng âm thanh MP3 chuẩn HD sắc nét (up to 320kbps) và file nén ZIP cho bài đọc dài.'
+            }
+        ],
+        footer: '© 2026 Veltrix Voice Platform. Tất cả quyền được bảo lưu.'
+    },
+    en: {
+        navHome: 'Home',
+        navDashboard: 'Dashboard',
+        navFeatures: 'Features',
+        navVoices: 'AI Voices',
+        navPricing: 'Pricing',
+        navFaq: 'FAQ',
+        navDonate: 'Buy me a Coffee ☕',
+        navStudio: 'Try Studio 🚀',
+        navLogout: 'Logout',
+        heroTitle: 'Upgrade to do more',
+        heroTitleHl1: 'do more',
+        heroSubtitle: 'Choose the right plan to optimize your content production workflow with leading AI technology.',
+        cycleMonthly: 'Monthly',
+        cycleYearly: 'Yearly',
+        discountBadge: 'Save up to 70%',
+        faqTitle: 'Frequently Asked Questions',
+        faqs: [
+            {
+                q: 'Can I cancel my subscription at any time?',
+                a: 'Yes, you can cancel your subscription anytime in your account settings. After cancellation, you still have access to Pro features until the end of the current billing cycle.'
+            },
+            {
+                q: 'Do unused tokens roll over to the next month?',
+                a: 'Token quotas for paid plans are refreshed monthly and do not roll over. For the Free plan, the 2,000 character limit is automatically refreshed at 00:00 every day.'
+            },
+            {
+                q: 'What is the refund policy?',
+                a: 'We offer a 100% refund within the first 7 days if you are not satisfied with the service quality and have not used more than 10% of your plan token quota.'
+            },
+            {
+                q: 'What file formats can I export?',
+                a: 'All plans support exporting HD MP3 audio files (up to 320kbps) and ZIP compressed files for long readings.'
             }
         ],
         footer: '© 2026 Veltrix Voice Platform. All rights reserved.'
-    },
-    ko: {
-        navHome: '홈',
-        navDashboard: '대시보드',
-        navFeatures: '기능',
-        navVoices: 'AI 음성',
-        navPricing: '요금제',
-        navFaq: '자주 묻는 질문',
-        navDonate: '커피 후원 ☕',
-        navStudio: '스튜디오 시작 🚀',
-        navLogout: '로그아웃',
-        heroBadge: '최고 수준의 AI 텍스트 음성 변환 기술',
-        heroTitle: 'AI 음성 생성',
-        heroTitleHl1: '생생하고',
-        heroTitleHl2: '사람처럼 자연스러운',
-        heroSubtitle: 'Veltrix Voice 플랫폼은 몇 초 만에 모든 텍스트를 고품질 MP3 오디오로 변환해 드립니다.',
-        heroCtaMain: '지금 무료로 시작하기',
-        heroCtaSecondary: '샘플 음성 듣기',
-        featuresTag: '뛰어난 기능',
-        featuresTitle: '왜 Veltrix Voice인가요?',
-        card1Title: '뉴럴 AI 음성',
-        card1Desc: '고급 딥러닝 모델이 99% 사람과 동일한 자연스러운 감정 억양을 구현합니다.',
-        card2Title: '초고속 변환',
-        card2Desc: '강력한 클라우드 서버로 1,000자 텍스트를 2초 이내에 MP3로 변환합니다.',
-        card3Title: '상업적 사용 권한',
-        card3Desc: '생성된 MP3 파일은 유튜브, TikTok 광고 등 상업적 프로젝트에 저작권 걱정 없이 사용 가능합니다.',
-        voicesTitle: '감정이 풍부한 AI 음성 둘러보기',
-        pricingTag: '투명한 요금제',
-        pricingTitle: '나에게 맞는 플랜 선택',
-        faqTag: '자주 묻는 질문',
-        faqTitle: '자주 묻는 질문 (FAQ)',
-        faqs: [],
-        footer: '© 2026 Veltrix Voice Platform. All rights reserved.'
-    },
-    zh: {
-        navHome: '首页',
-        navDashboard: '仪表板',
-        navFeatures: '功能特点',
-        navVoices: 'AI 语音',
-        navPricing: '价格方案',
-        navFaq: '常见问题',
-        navDonate: '赞助咖啡 ☕',
-        navStudio: '进入 Studio 🚀',
-        navLogout: '退出登录',
-        heroBadge: '顶尖 AI 文本转语音技术',
-        heroTitle: '生成 AI 语音',
-        heroTitleHl1: '生动逼真',
-        heroTitleHl2: '媲美真人自然发音',
-        heroSubtitle: 'Veltrix Voice 平台帮助您在几秒钟内将任何文本转换为高质量 MP3 音频。',
-        heroCtaMain: '立即免费体验',
-        heroCtaSecondary: '试听试听试听',
-        featuresTag: '卓越功能',
-        featuresTitle: '为什么选择 Veltrix Voice？',
-        card1Title: '神经网络 AI 语音',
-        card1Desc: '先进的深度学习模型精确发音与停顿，保持 99% 真人般的自然情感语调。',
-        card2Title: '极速转换',
-        card2Desc: '强大的云服务器系统，2 秒内将 1,000 字文本转换为 MP3。',
-        card3Title: '商业授权',
-        card3Desc: '生成的 MP3 文件可自由用于 YouTube、TikTok 变现广告项目，无版权忧虑。',
-        voicesTitle: '探索充满情感的 AI 语音',
-        pricingTag: '透明价格方案',
-        pricingTitle: '选择适合您的方案',
-        faqTag: '常见问题',
-        faqTitle: '常见问题 (FAQ)',
-        faqs: [],
-        footer: '© 2026 Veltrix Voice Platform. All rights reserved.'
-    },
-    fr: {
-        navHome: 'Accueil',
-        navDashboard: 'Tableau de bord',
-        navFeatures: 'Fonctionnalités',
-        navVoices: 'Voix IA',
-        navPricing: 'Tarifs',
-        navFaq: 'FAQ',
-        navDonate: 'Offrir un café ☕',
-        navStudio: 'Lancer Studio 🚀',
-        navLogout: 'Déconnexion',
-        heroBadge: 'Technologie de synthèse vocale IA de pointe',
-        heroTitle: 'Créer des Voix IA',
-        heroTitleHl1: 'Vivid',
-        heroTitleHl2: 'Naturelles comme l\'humain',
-        heroSubtitle: 'La plateforme Veltrix Voice vous aide à transformer n\'importe quel texte en audio MP3 de haute qualité en quelques secondes.',
-        heroCtaMain: 'Essayer maintenant',
-        heroCtaSecondary: 'Écouter des échantillons',
-        featuresTag: 'CARACTÉRISTIQUES EXCEPTIONNELLES',
-        featuresTitle: 'Pourquoi choisir Veltrix Voice ?',
-        card1Title: 'Voix IA Neurales',
-        card1Desc: 'Les modèles d\'apprentissage profond avancés se prononcent avec précision.',
-        card2Title: 'Ultra Rapide',
-        card2Desc: 'Convertit 1 000 caractères de texte en MP3 en moins de 2 secondes.',
-        card3Title: 'Droits commerciaux',
-        card3Desc: 'Utilisez les fichiers MP3 pour vos projets monétisés sans souci de droit d\'auteur.',
-        voicesTitle: 'Découvrez des voix IA émouvantes',
-        pricingTag: 'TARIFICATION TRANSPARENTE',
-        pricingTitle: 'Choisissez le forfait qui vous convient',
-        faqTag: 'FOIRE AUX QUESTIONS',
-        faqTitle: 'Foire Aux Questions (FAQ)',
-        faqs: [],
-        footer: '© 2026 Veltrix Voice Platform. Tous droits réservés.'
     }
 };
 
 class PageAdminController {
+    // Lấy nội dung trang theo slug ('landing' | 'pricing')
     static async getPageContent(req, res) {
         try {
             const { slug } = req.params;
-            let page = await PageContent.findOne({ slug: slug || 'landing' });
+            const targetSlug = slug || 'landing';
+            const defaultTranslations = targetSlug === 'pricing' ? PRICING_DEFAULT_TRANSLATIONS : LANDING_DEFAULT_TRANSLATIONS;
+
+            let page = await PageContent.findOne({ slug: targetSlug });
             
             if (!page) {
-                page = new PageContent({ slug: slug || 'landing', translations: DEFAULT_TRANSLATIONS });
+                page = new PageContent({ slug: targetSlug, translations: defaultTranslations });
                 await page.save();
             } else {
                 let translationsObj = page.translations ? (page.translations instanceof Map ? Object.fromEntries(page.translations) : page.translations) : {};
-                Object.keys(DEFAULT_TRANSLATIONS).forEach(lang => {
+                Object.keys(defaultTranslations).forEach(lang => {
                     if (!translationsObj[lang]) {
-                        translationsObj[lang] = DEFAULT_TRANSLATIONS[lang];
+                        translationsObj[lang] = defaultTranslations[lang];
                     } else {
                         translationsObj[lang] = {
-                            ...DEFAULT_TRANSLATIONS[lang],
+                            ...defaultTranslations[lang],
                             ...translationsObj[lang]
                         };
                     }
@@ -254,12 +198,14 @@ class PageAdminController {
         }
     }
 
+    // Cập nhật nội dung trang theo slug
     static async updatePageContent(req, res) {
         try {
             const { slug } = req.params;
-            let page = await PageContent.findOne({ slug: slug || 'landing' });
+            const targetSlug = slug || 'landing';
+            let page = await PageContent.findOne({ slug: targetSlug });
             if (!page) {
-                page = new PageContent({ slug: slug || 'landing' });
+                page = new PageContent({ slug: targetSlug });
             }
 
             if (req.body.translations) {
@@ -274,7 +220,7 @@ class PageAdminController {
             });
 
             await page.save();
-            return res.json({ success: true, message: `Cập nhật nội dung trang [${slug}] thành công!`, page });
+            return res.json({ success: true, message: `Cập nhật nội dung trang [${targetSlug}] thành công!`, page });
         } catch (err) {
             return res.status(500).json({ error: 'Lỗi cập nhật nội dung trang: ' + err.message });
         }
