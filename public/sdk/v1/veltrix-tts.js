@@ -595,8 +595,9 @@
         if (script) {
             const apiKey = script.getAttribute('data-apikey');
             const target = script.getAttribute('data-target');
+            const serverUrl = script.getAttribute('data-server') || (script.src ? new URL(script.src).origin : '');
             if (apiKey) {
-                window.VeltrixTTS.init({ apiKey, target });
+                window.VeltrixTTS.init({ apiKey, target, serverUrl });
             }
         }
     };
