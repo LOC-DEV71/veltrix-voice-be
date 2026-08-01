@@ -2,6 +2,12 @@ const PageContent = require('../../models/pageContentModel');
 
 const DEFAULT_TRANSLATIONS = {
     vi: {
+        navFeatures: 'Tính năng',
+        navVoices: 'Giọng đọc AI',
+        navPricing: 'Bảng giá',
+        navFaq: 'Hỏi đáp',
+        navDonate: 'Donate Cà Phê ☕',
+        navStudio: 'Vào Studio 🚀',
         heroBadge: 'Công Nghệ Chuyển Văn Bản Thành Giọng Nói AI Đỉnh Cao',
         heroTitle: 'Tạo Giọng Đọc AI',
         heroTitleHl1: 'Sống Động',
@@ -32,6 +38,12 @@ const DEFAULT_TRANSLATIONS = {
         footer: '© 2026 Veltrix Voice Platform. Tất cả quyền được bảo lưu.'
     },
     en: {
+        navFeatures: 'Features',
+        navVoices: 'AI Voices',
+        navPricing: 'Pricing',
+        navFaq: 'FAQ',
+        navDonate: 'Buy me a Coffee ☕',
+        navStudio: 'Try Studio 🚀',
         heroBadge: 'Top-tier AI Text-to-Speech Technology',
         heroTitle: 'Create AI Voices',
         heroTitleHl1: 'Vivid',
