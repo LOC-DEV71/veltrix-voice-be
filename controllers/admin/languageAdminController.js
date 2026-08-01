@@ -1,6 +1,6 @@
 const Language = require('../../models/languageModel');
 
-const INITIAL_LANGUAGES = [
+const DEFAULT_LANGUAGES = [
     { code: 'vi', name: 'Tiếng Việt 🇻🇳', isDefault: true, isActive: true },
     { code: 'en', name: 'English 🇬🇧', isDefault: false, isActive: true },
     { code: 'ja', name: '日本語 (Tiếng Nhật) 🇯🇵', isDefault: false, isActive: true },
@@ -14,12 +14,16 @@ class LanguageAdminController {
     static async getLanguages(req, res) {
         try {
             let languages = await Language.find().sort({ isDefault: -1, createdAt: 1 });
+            
+            // Nếu chưa có ngôn ngữ nào trong DB, tự động seed 6 ngôn ngữ chuẩn
             if (!languages || languages.length === 0) {
-                await Language.insertMany(INITIAL_LANGUAGES);
+                await Language.insertMany(DEFAULT_LANGUAGES);
                 languages = await Language.find().sort({ isDefault: -1, createdAt: 1 });
             }
+
             return res.json({ success: true, languages });
         } catch (err) {
+            console.error("Lỗi getLanguages Admin:", err);
             return res.status(500).json({ error: "Lỗi lấy danh sách ngôn ngữ: " + err.message });
         }
     }
