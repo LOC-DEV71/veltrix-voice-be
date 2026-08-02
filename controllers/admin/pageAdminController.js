@@ -164,13 +164,42 @@ const PRICING_DEFAULT_TRANSLATIONS = {
     }
 };
 
+const STUDIO_DEFAULT_TRANSLATIONS = {
+    vi: {
+        hubTitle: 'Developer Integration Hub & Web SDK',
+        hubSubtitle: 'Tích hợp trực tiếp công cụ tạo giọng đọc AI Veltrix Voice vào Website, Blog, CMS (WordPress) hoặc App của bạn với 1 dòng mã.',
+        createKeyBtn: 'Tạo API Key Mới',
+        noKeysTitle: 'Chưa có API Key nào được khởi tạo',
+        noKeysDesc: 'Khởi tạo API Key để cấp quyền truy cập dịch vụ giọng đọc AI cho các website và ứng dụng của bạn.',
+        tabCdn: 'Tích hợp CDN Script',
+        tabJs: 'Khởi tạo JS SDK',
+        tabRest: 'Gọi REST API Direct',
+        subHistoryTitle: 'Lịch Sử Gói Cước & Nạp Hạn Mức',
+        audioHistoryTitle: 'Lịch Sử Bài Đọc MP3'
+    },
+    en: {
+        hubTitle: 'Developer Integration Hub & Web SDK',
+        hubSubtitle: 'Integrate Veltrix Voice AI Text-to-Speech tool into your Website, Blog, CMS (WordPress) or App with a single line of code.',
+        createKeyBtn: 'Create New API Key',
+        noKeysTitle: 'No API Keys Created Yet',
+        noKeysDesc: 'Create an API Key to grant access to AI voice synthesis services for your websites and applications.',
+        tabCdn: 'CDN Script Integration',
+        tabJs: 'JS SDK Initialization',
+        tabRest: 'Call REST API Direct',
+        subHistoryTitle: 'Subscription & Quota History',
+        audioHistoryTitle: 'MP3 Audio History'
+    }
+};
+
 class PageAdminController {
-    // Lấy nội dung trang theo slug ('landing' | 'pricing')
+    // Lấy nội dung trang theo slug ('landing' | 'pricing' | 'studio')
     static async getPageContent(req, res) {
         try {
             const { slug } = req.params;
             const targetSlug = slug || 'landing';
-            const defaultTranslations = targetSlug === 'pricing' ? PRICING_DEFAULT_TRANSLATIONS : LANDING_DEFAULT_TRANSLATIONS;
+            let defaultTranslations = LANDING_DEFAULT_TRANSLATIONS;
+            if (targetSlug === 'pricing') defaultTranslations = PRICING_DEFAULT_TRANSLATIONS;
+            if (targetSlug === 'studio') defaultTranslations = STUDIO_DEFAULT_TRANSLATIONS;
 
             let page = await PageContent.findOne({ slug: targetSlug });
             
