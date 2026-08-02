@@ -190,7 +190,21 @@ const STUDIO_DEFAULT_TRANSLATIONS = {
         thPrice: 'GIÁ TIỀN',
         thQuota: 'HẠN MỨC CỘNG',
         thDate: 'NGÀY GIAO DỊCH',
-        thStatus: 'TRẠNG THÁI'
+        thStatus: 'TRẠNG THÁI',
+
+        // Modal Tên Miền & Key
+        domainModalTitle: '🛡️ Cấu Hình Tên Miền Bảo Mật',
+        domainModalDesc: 'Chỉ các Tên Miền (Domain) có tên trong danh sách bên dưới mới được phép sử dụng API Key này. Kẻ xấu copy Key của bạn sang web khác sẽ bị hệ thống chặn ngay lập tức.',
+        domainModalExample: 'Ví dụ: mycompany.com, blog.mycompany.vn (Phân cách bằng dấu phẩy, để trống nếu muốn cho phép tất cả tên miền).',
+        domainModalPlaceholder: 'mysite.com, blogspot.com (hoặc để trống)...',
+        saveConfigBtn: 'Lưu Cấu Hình 🛡️',
+        cancelBtn: 'Hủy',
+        createKeyModalTitle: 'Tạo API Key Mới',
+        createKeyPlaceholder: 'Tên ứng dụng / website (Ví dụ: WordPress Blog, Localhost App)...',
+        confirmCreateKeyBtn: 'Tạo Key 🔑',
+        deleteKeyModalTitle: 'Xóa API Key này?',
+        deleteKeyModalText: 'Các ứng dụng đang dùng Key này sẽ không thể gọi API giọng đọc nữa.',
+        confirmDeleteKeyBtn: 'Đồng ý xóa 🗑️'
     },
     en: {
         welcomeText: 'Welcome',
@@ -217,7 +231,21 @@ const STUDIO_DEFAULT_TRANSLATIONS = {
         thPrice: 'PRICE',
         thQuota: 'QUOTA ADDED',
         thDate: 'TRANSACTION DATE',
-        thStatus: 'STATUS'
+        thStatus: 'STATUS',
+
+        // Modal Domain & Key
+        domainModalTitle: '🛡️ Domain Security Configuration',
+        domainModalDesc: 'Only listed domains are allowed to use this API Key. Unauthorized usage from other domains will be blocked immediately.',
+        domainModalExample: 'Example: mycompany.com, blog.mycompany.com (Comma-separated, leave empty to allow all domains).',
+        domainModalPlaceholder: 'mysite.com, blogspot.com (or leave blank)...',
+        saveConfigBtn: 'Save Config 🛡️',
+        cancelBtn: 'Cancel',
+        createKeyModalTitle: 'Create New API Key',
+        createKeyPlaceholder: 'App or website name (e.g. WordPress Blog, Localhost App)...',
+        confirmCreateKeyBtn: 'Create Key 🔑',
+        deleteKeyModalTitle: 'Delete this API Key?',
+        deleteKeyModalText: 'Applications using this key will no longer be able to call the voice API.',
+        confirmDeleteKeyBtn: 'Confirm Delete 🗑️'
     }
 };
 
