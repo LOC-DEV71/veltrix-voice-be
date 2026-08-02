@@ -166,28 +166,58 @@ const PRICING_DEFAULT_TRANSLATIONS = {
 
 const STUDIO_DEFAULT_TRANSLATIONS = {
     vi: {
+        welcomeText: 'Xin chào',
+        accountSubtext: 'Tài khoản dịch vụ Giọng nói Trí tuệ Nhân tạo Veltrix Voice',
+        upgradeBtn: 'Nâng Cấp Gói Veltrix',
+        statLimitTitle: 'Hạn Mức Ký Tự / Ngày',
+        statLimitUnit: 'Ký tự',
+        statAudioTitle: 'Tổng Bài Đọc Đã Tạo',
+        statCreateLink: 'Tạo bài đọc mới trong Studio',
         hubTitle: 'Developer Integration Hub & Web SDK',
         hubSubtitle: 'Tích hợp trực tiếp công cụ tạo giọng đọc AI Veltrix Voice vào Website, Blog, CMS (WordPress) hoặc App của bạn với 1 dòng mã.',
         createKeyBtn: 'Tạo API Key Mới',
         noKeysTitle: 'Chưa có API Key nào được khởi tạo',
         noKeysDesc: 'Khởi tạo API Key để cấp quyền truy cập dịch vụ giọng đọc AI cho các website và ứng dụng của bạn.',
+        lockDomainBtn: 'Khóa Tên Miền',
+        copyKeyBtn: 'Copy Key',
+        deleteBtn: 'Xóa',
         tabCdn: 'Tích hợp CDN Script',
         tabJs: 'Khởi tạo JS SDK',
         tabRest: 'Gọi REST API Direct',
-        subHistoryTitle: 'Lịch Sử Gói Cước & Nạp Hạn Mức',
-        audioHistoryTitle: 'Lịch Sử Bài Đọc MP3'
+        copyCodeBtn: 'Copy Đoạn Mã',
+        subHistoryTitle: 'Lịch Sử Thanh Toán & Đăng Ký Gói',
+        thPlan: 'TÊN GÓI DỊCH VỤ',
+        thPrice: 'GIÁ TIỀN',
+        thQuota: 'HẠN MỨC CỘNG',
+        thDate: 'NGÀY GIAO DỊCH',
+        thStatus: 'TRẠNG THÁI'
     },
     en: {
+        welcomeText: 'Welcome',
+        accountSubtext: 'Veltrix Voice AI Speech Platform Account',
+        upgradeBtn: 'Upgrade Veltrix Plan',
+        statLimitTitle: 'Daily Character Limit',
+        statLimitUnit: 'characters',
+        statAudioTitle: 'Total Audio Generated',
+        statCreateLink: 'Create new audio in Studio',
         hubTitle: 'Developer Integration Hub & Web SDK',
         hubSubtitle: 'Integrate Veltrix Voice AI Text-to-Speech tool into your Website, Blog, CMS (WordPress) or App with a single line of code.',
         createKeyBtn: 'Create New API Key',
         noKeysTitle: 'No API Keys Created Yet',
         noKeysDesc: 'Create an API Key to grant access to AI voice synthesis services for your websites and applications.',
+        lockDomainBtn: 'Lock Domain',
+        copyKeyBtn: 'Copy Key',
+        deleteBtn: 'Delete',
         tabCdn: 'CDN Script Integration',
         tabJs: 'JS SDK Initialization',
         tabRest: 'Call REST API Direct',
+        copyCodeBtn: 'Copy Code',
         subHistoryTitle: 'Subscription & Quota History',
-        audioHistoryTitle: 'MP3 Audio History'
+        thPlan: 'SERVICE PLAN',
+        thPrice: 'PRICE',
+        thQuota: 'QUOTA ADDED',
+        thDate: 'TRANSACTION DATE',
+        thStatus: 'STATUS'
     }
 };
 
