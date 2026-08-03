@@ -86,6 +86,20 @@ const settingSchema = new mongoose.Schema({
     awsRegion: {
         type: String,
         default: 'us-east-1'
+    },
+    // Microsoft Azure / Edge Speech Settings
+    azureSpeechKey: {
+        type: String,
+        default: ''
+    },
+    azureRegion: {
+        type: String,
+        default: 'eastus'
+    },
+    // Google Cloud TTS Settings
+    googleTtsApiKey: {
+        type: String,
+        default: ''
     }
 }, {
     timestamps: true

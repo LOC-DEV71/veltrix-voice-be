@@ -42,7 +42,10 @@ class SettingAdminController {
                 maintenanceMode,
                 awsAccessKeyId,
                 awsSecretAccessKey,
-                awsRegion
+                awsRegion,
+                azureSpeechKey,
+                azureRegion,
+                googleTtsApiKey
             } = req.body;
 
             let setting = await Setting.findOne();
@@ -75,6 +78,10 @@ class SettingAdminController {
             if (awsAccessKeyId !== undefined) setting.awsAccessKeyId = awsAccessKeyId;
             if (awsSecretAccessKey !== undefined) setting.awsSecretAccessKey = awsSecretAccessKey;
             if (awsRegion !== undefined) setting.awsRegion = awsRegion;
+
+            if (azureSpeechKey !== undefined) setting.azureSpeechKey = azureSpeechKey;
+            if (azureRegion !== undefined) setting.azureRegion = azureRegion;
+            if (googleTtsApiKey !== undefined) setting.googleTtsApiKey = googleTtsApiKey;
 
             await setting.save();
 
