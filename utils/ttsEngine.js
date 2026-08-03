@@ -197,10 +197,19 @@ async function generatePollySpeechBuffer(text, voiceId, options = {}) {
  * Smart Hybrid TTS Engine (Microsoft Neural, AWS Polly, Google TTS)
  */
 async function generateSpeechBuffer(text, voice = 'vi-VN-HoaiMyNeural', options = {}) {
-    const selectedVoice = voice || 'vi-VN-HoaiMyNeural';
+    // 0. Kiểm tra nếu là giọng AWS Polly (từ mã voiceId hoặc từ trường provider trong DB)
+    let isAwsVoice = selectedVoice.toLowerCase().startsWith('aws-') || selectedVoice.toLowerCase().startsWith('polly-');
+    if (!isAwsVoice) {
+        try {
+            const Voice = require('../models/voiceModel');
+            const vObj = await Voice.findOne({ voiceId: selectedVoice });
+            if (vObj && vObj.provider && vObj.provider.toLowerCase().includes('aws')) {
+                isAwsVoice = true;
+            }
+        } catch (e) {}
+    }
 
-    // 0. Nếu là giọng AWS Polly (bắt đầu bằng aws-, polly- hoặc nằm trong danh sách giọng Polly)
-    if (selectedVoice.toLowerCase().startsWith('aws-') || selectedVoice.toLowerCase().startsWith('polly-')) {
+    if (isAwsVoice) {
         try {
             return await generatePollySpeechBuffer(text, selectedVoice, options);
         } catch (awsErr) {
