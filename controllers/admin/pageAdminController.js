@@ -164,7 +164,7 @@ const PRICING_DEFAULT_TRANSLATIONS = {
     }
 };
 
-const STUDIO_DEFAULT_TRANSLATIONS = {
+const DASHBOARD_DEFAULT_TRANSLATIONS = {
     vi: {
         welcomeText: 'Xin chào',
         accountSubtext: 'Tài khoản dịch vụ Giọng nói Trí tuệ Nhân tạo Veltrix Voice',
@@ -249,14 +249,64 @@ const STUDIO_DEFAULT_TRANSLATIONS = {
     }
 };
 
+const STUDIO_DEFAULT_TRANSLATIONS = {
+    vi: {
+        voiceSettingsTitle: 'CÀI ĐẶT GIỌNG ĐỌC AI',
+        listenSampleBtn: 'Nghe thử',
+        stopSampleBtn: 'Dừng thử',
+        loadingSampleBtn: 'Đang tải...',
+        titlePlaceholder: 'Tên bài đọc / dự án (Ví dụ: Review iPhone 16...)',
+        defaultFolder: 'Mặc định',
+        addFolderBtn: '+ Thư mục',
+        speedLabel: 'Tốc độ đọc',
+        pitchLabel: 'Độ cao giọng (Pitch)',
+        defaultText: 'Xin chào! Đây là ứng dụng tạo giọng nói trí tuệ nhân tạo được xây dựng với chuẩn kiến trúc Redux Toolkit và MVC.',
+        charCountLabel: 'Ký tự',
+        tokenCostLabel: 'Token tiêu hao',
+        sampleTextBtn: 'Văn bản mẫu',
+        pauseBtn: '+ Ngắt 0.5s',
+        clearBtn: 'Xóa sạch',
+        previewBtn: 'Nghe trước',
+        generateBtn: 'Generate Audio',
+        historyTitle: 'LỊCH SỬ TẠO AUDIO',
+        allFolders: 'Tất cả thư mục',
+        playBtn: 'Nghe',
+        downloadMp3Btn: 'Tải MP3'
+    },
+    en: {
+        voiceSettingsTitle: 'AI VOICE SETTINGS',
+        listenSampleBtn: 'Listen Sample',
+        stopSampleBtn: 'Stop Sample',
+        loadingSampleBtn: 'Loading...',
+        titlePlaceholder: 'Audio / project title (e.g. iPhone 16 Review...)',
+        defaultFolder: 'Default',
+        addFolderBtn: '+ Folder',
+        speedLabel: 'Reading Speed',
+        pitchLabel: 'Pitch',
+        defaultText: 'Hello! This is an AI voice generation application built with Redux Toolkit and MVC architecture.',
+        charCountLabel: 'Characters',
+        tokenCostLabel: 'Tokens Used',
+        sampleTextBtn: 'Sample Text',
+        pauseBtn: '+ Pause 0.5s',
+        clearBtn: 'Clear All',
+        previewBtn: 'Preview',
+        generateBtn: 'Generate Audio',
+        historyTitle: 'AUDIO GENERATION HISTORY',
+        allFolders: 'All Folders',
+        playBtn: 'Play',
+        downloadMp3Btn: 'Download MP3'
+    }
+};
+
 class PageAdminController {
-    // Lấy nội dung trang theo slug ('landing' | 'pricing' | 'studio')
+    // Lấy nội dung trang theo slug ('landing' | 'pricing' | 'dashboard' | 'studio')
     static async getPageContent(req, res) {
         try {
             const { slug } = req.params;
             const targetSlug = slug || 'landing';
             let defaultTranslations = LANDING_DEFAULT_TRANSLATIONS;
             if (targetSlug === 'pricing') defaultTranslations = PRICING_DEFAULT_TRANSLATIONS;
+            if (targetSlug === 'dashboard') defaultTranslations = DASHBOARD_DEFAULT_TRANSLATIONS;
             if (targetSlug === 'studio') defaultTranslations = STUDIO_DEFAULT_TRANSLATIONS;
 
             let page = await PageContent.findOne({ slug: targetSlug });
