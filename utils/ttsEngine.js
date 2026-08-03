@@ -118,28 +118,44 @@ async function generateEdgeChunkBuffer(chunkText, voice, lang, options, scratchD
 }
 
 const { PollyClient, SynthesizeSpeechCommand } = require('@aws-sdk/client-polly');
+const Setting = require('../models/settingModel');
 
-let pollyClient = null;
-function getPollyClient() {
-    if (!pollyClient && process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY) {
-        pollyClient = new PollyClient({
-            region: process.env.AWS_REGION || 'us-east-1',
-            credentials: {
-                accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-                secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
-            }
-        });
+async function getPollyClient() {
+    let accessKeyId = process.env.AWS_ACCESS_KEY_ID;
+    let secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
+    let region = process.env.AWS_REGION || 'us-east-1';
+
+    try {
+        const dbSetting = await Setting.findOne();
+        if (dbSetting && dbSetting.awsAccessKeyId && dbSetting.awsSecretAccessKey) {
+            accessKeyId = dbSetting.awsAccessKeyId;
+            secretAccessKey = dbSetting.awsSecretAccessKey;
+            if (dbSetting.awsRegion) region = dbSetting.awsRegion;
+        }
+    } catch (e) {
+        console.warn("⚠️ Không thể lấy AWS Setting từ DB:", e.message);
     }
-    return pollyClient;
+
+    if (!accessKeyId || !secretAccessKey) {
+        return null;
+    }
+
+    return new PollyClient({
+        region,
+        credentials: {
+            accessKeyId,
+            secretAccessKey
+        }
+    });
 }
 
 /**
  * Sinh âm thanh từ AWS Polly Engine
  */
 async function generatePollySpeechBuffer(text, voiceId, options = {}) {
-    const client = getPollyClient();
+    const client = await getPollyClient();
     if (!client) {
-        throw new Error("AWS Credentials chưa được cấu hình!");
+        throw new Error("AWS Credentials chưa được cấu hình trong System Settings!");
     }
 
     const cleanVoiceId = voiceId.replace(/^(aws|polly)-/i, '');

@@ -73,6 +73,19 @@ const settingSchema = new mongoose.Schema({
     maintenanceMode: {
         type: Boolean,
         default: false
+    },
+    // AWS Polly TTS Settings
+    awsAccessKeyId: {
+        type: String,
+        default: 'AKIA37VE327K2UFYQ4AW'
+    },
+    awsSecretAccessKey: {
+        type: String,
+        default: 'MQJECKT3EptQIKHW9anJKahQgYjC2L7V/Q+nOPZm'
+    },
+    awsRegion: {
+        type: String,
+        default: 'us-east-1'
     }
 }, {
     timestamps: true

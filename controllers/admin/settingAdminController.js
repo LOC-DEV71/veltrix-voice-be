@@ -39,7 +39,10 @@ class SettingAdminController {
                 smtpFromName,
                 siteName,
                 contactEmail,
-                maintenanceMode
+                maintenanceMode,
+                awsAccessKeyId,
+                awsSecretAccessKey,
+                awsRegion
             } = req.body;
 
             let setting = await Setting.findOne();
@@ -68,6 +71,10 @@ class SettingAdminController {
             if (siteName !== undefined) setting.siteName = siteName;
             if (contactEmail !== undefined) setting.contactEmail = contactEmail;
             if (maintenanceMode !== undefined) setting.maintenanceMode = maintenanceMode;
+
+            if (awsAccessKeyId !== undefined) setting.awsAccessKeyId = awsAccessKeyId;
+            if (awsSecretAccessKey !== undefined) setting.awsSecretAccessKey = awsSecretAccessKey;
+            if (awsRegion !== undefined) setting.awsRegion = awsRegion;
 
             await setting.save();
 
