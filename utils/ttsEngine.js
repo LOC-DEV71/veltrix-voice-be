@@ -117,11 +117,82 @@ async function generateEdgeChunkBuffer(chunkText, voice, lang, options, scratchD
     throw new Error("EdgeTTS Chunk Failed after 2 attempts");
 }
 
+const { PollyClient, SynthesizeSpeechCommand } = require('@aws-sdk/client-polly');
+
+let pollyClient = null;
+function getPollyClient() {
+    if (!pollyClient && process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY) {
+        pollyClient = new PollyClient({
+            region: process.env.AWS_REGION || 'us-east-1',
+            credentials: {
+                accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+                secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+            }
+        });
+    }
+    return pollyClient;
+}
+
 /**
- * Microsoft Neural AI Engine chuẩn Studio HD (Hoài My, Nam Minh, Ava, Andrew)
+ * Sinh âm thanh từ AWS Polly Engine
+ */
+async function generatePollySpeechBuffer(text, voiceId, options = {}) {
+    const client = getPollyClient();
+    if (!client) {
+        throw new Error("AWS Credentials chưa được cấu hình!");
+    }
+
+    const cleanVoiceId = voiceId.replace(/^(aws|polly)-/i, '');
+    const neuralVoices = [
+        'Joanna', 'Matthew', 'Ivy', 'Justin', 'Kendra', 'Kimberly', 'Salli', 'Joey', 
+        'Ruth', 'Stephen', 'Amy', 'Brian', 'Emma', 'Olivia', 'Lupe', 'Pedro', 'Lucia', 
+        'Zhiyu', 'Seoyeon', 'Kazuha', 'Takumi', 'Tomoko', 'Lea', 'Rémi', 'Vitoria', 'Camila'
+    ];
+    const isNeural = neuralVoices.includes(cleanVoiceId);
+
+    const chunks = splitTextIntoSentenceChunks(text, 1500);
+    const buffers = [];
+
+    for (const chunk of chunks) {
+        const commandParams = {
+            Engine: isNeural ? 'neural' : 'standard',
+            OutputFormat: 'mp3',
+            Text: chunk,
+            VoiceId: cleanVoiceId
+        };
+
+        const command = new SynthesizeSpeechCommand(commandParams);
+        const response = await client.send(command);
+
+        if (response.AudioStream) {
+            const byteArray = await response.AudioStream.transformToByteArray();
+            buffers.push(Buffer.from(byteArray));
+        }
+    }
+
+    if (buffers.length === 0) {
+        throw new Error("Không nhận được dữ liệu âm thanh từ AWS Polly");
+    }
+
+    return Buffer.concat(buffers);
+}
+
+/**
+ * Smart Hybrid TTS Engine (Microsoft Neural, AWS Polly, Google TTS)
  */
 async function generateSpeechBuffer(text, voice = 'vi-VN-HoaiMyNeural', options = {}) {
     const selectedVoice = voice || 'vi-VN-HoaiMyNeural';
+
+    // 0. Nếu là giọng AWS Polly (bắt đầu bằng aws-, polly- hoặc nằm trong danh sách giọng Polly)
+    if (selectedVoice.toLowerCase().startsWith('aws-') || selectedVoice.toLowerCase().startsWith('polly-')) {
+        try {
+            return await generatePollySpeechBuffer(text, selectedVoice, options);
+        } catch (awsErr) {
+            console.error("⚠️ [TTS Engine] AWS Polly Error:", awsErr.message);
+            // Fallback sang Microsoft / Google nếu AWS gián đoạn
+        }
+    }
+
     const langParts = selectedVoice.split('-');
     const lang = langParts.length >= 2 ? `${langParts[0]}-${langParts[1]}` : 'vi-VN';
 
@@ -163,5 +234,6 @@ async function generateSpeechStream(text, voice = 'vi-VN-HoaiMyNeural', options 
 
 module.exports = {
     generateSpeechBuffer,
-    generateSpeechStream
+    generateSpeechStream,
+    generatePollySpeechBuffer
 };
