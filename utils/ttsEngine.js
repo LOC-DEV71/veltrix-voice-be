@@ -89,8 +89,8 @@ async function generateEdgeChunkBuffer(chunkText, voice, lang, options, scratchD
         }
     }
 
-    // Thử lại 2 lần trước khi bỏ cuộc
-    for (let attempt = 1; attempt <= 2; attempt++) {
+    // Thử lại 5 lần trước khi bỏ cuộc (chống Rate Limit của Microsoft)
+    for (let attempt = 1; attempt <= 5; attempt++) {
         const tempFile = path.join(scratchDir, `tts_chunk_${Date.now()}_${crypto.randomBytes(4).toString('hex')}.mp3`);
         try {
             const tts = new EdgeTTS({
@@ -110,11 +110,12 @@ async function generateEdgeChunkBuffer(chunkText, voice, lang, options, scratchD
             }
         } catch (err) {
             try { if (fs.existsSync(tempFile)) fs.unlinkSync(tempFile); } catch(e) {}
-            if (attempt === 2) throw err;
-            await new Promise(r => setTimeout(r, 300));
+            if (attempt === 5) throw err;
+            // Delay tăng dần để đợi Microsoft nhả chặn: 800ms, 1600ms...
+            await new Promise(r => setTimeout(r, attempt * 800));
         }
     }
-    throw new Error("EdgeTTS Chunk Failed after 2 attempts");
+    throw new Error("EdgeTTS Chunk Failed after 5 attempts");
 }
 
 const { PollyClient, SynthesizeSpeechCommand } = require('@aws-sdk/client-polly');
